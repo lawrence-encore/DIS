@@ -81,6 +81,7 @@
         </div>
 
         <?php require('views/_script.php'); ?>
+        
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/pages/index.js?v=<?php echo rand(); ?>"></script>
