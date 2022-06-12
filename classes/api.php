@@ -507,6 +507,81 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_policy_exist
+    # Purpose    : Checks if the policy exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_policy_exist($policy_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_policy_exist(:policy_id)');
+            $sql->bindValue(':policy_id', $policy_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_permission_exist
+    # Purpose    : Checks if the permission exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_permission_exist($permission_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_permission_exist(:permission_id)');
+            $sql->bindValue(':permission_id', $permission_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_role_exist
+    # Purpose    : Checks if the role exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_role_exist($role_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_role_exist(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -525,6 +600,33 @@ class Api{
             $sql->bindValue(':login_attemp', $login_attemp);
             $sql->bindValue(':last_failed_attempt_date', $last_failed_attempt_date);
 
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_system_parameter_value
+    # Purpose    : Updates system parameter value.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_system_parameter_value($parameter_number, $parameter_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL update_system_parameter_value(:parameter_id, :parameter_number, :record_log)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+            $sql->bindValue(':parameter_number', $parameter_number);
+            $sql->bindValue(':record_log', $record_log);
+        
             if($sql->execute()){
                 return true;
             }
@@ -572,19 +674,19 @@ class Api{
 
     # -------------------------------------------------------------
     #
-    # Name       : update_system_parameter
-    # Purpose    : Updates system parameter.
+    # Name       : update_policy
+    # Purpose    : Updates policy.
     #
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function update_system_parameter($parameter_id, $parameter, $extension, $parameter_number, $username){
+    public function update_policy($policy, $policy_id, $policy_description, $username){
         if ($this->databaseConnection()) {
             $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
-            $system_parameter_details = $this->get_system_parameter_details($parameter_id);
+            $policy_details = $this->get_policy_details($policy_id);
             
-            if(!empty($system_parameter_details[0]['TRANSACTION_LOG_ID'])){
-                $transaction_log_id = $system_parameter_details[0]['TRANSACTION_LOG_ID'];
+            if(!empty($policy_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $policy_details[0]['TRANSACTION_LOG_ID'];
             }
             else{
                 # Get transaction log id
@@ -593,18 +695,17 @@ class Api{
                 $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
             }
 
-            $sql = $this->db_connection->prepare('CALL update_system_parameter(:parameter_id, :parameter, :extension, :parameter_number, :transaction_log_id, :record_log)');
-            $sql->bindValue(':parameter_id', $parameter_id);
-            $sql->bindValue(':parameter', $parameter);
-            $sql->bindValue(':extension', $extension);
-            $sql->bindValue(':parameter_number', $parameter_number);
+            $sql = $this->db_connection->prepare('CALL update_policy(:policy_id, :policy, :policy_description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':policy_id', $policy_id);
+            $sql->bindValue(':policy', $policy);
+            $sql->bindValue(':policy_description', $policy_description);
             $sql->bindValue(':transaction_log_id', $transaction_log_id);
             $sql->bindValue(':record_log', $record_log);
         
             if($sql->execute()){
-                if(!empty($system_parameter_details[0]['TRANSACTION_LOG_ID'])){
-                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system parameter (' . $parameter_id . ').');
-                                        
+                if(!empty($policy_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated policy.');
+                                    
                     if($insert_transaction_log){
                         return true;
                     }
@@ -617,8 +718,142 @@ class Api{
                     $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
 
                     if($update_system_parameter_value){
-                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated system parameter (' . $parameter_id . ').');
-                                        
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated policy.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_permission
+    # Purpose    : Updates permission.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_permission($permission_id, $policy_id, $permission, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $permission_details = $this->get_permission_details($permission_id);
+            
+            if(!empty($permission_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $permission_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_permission(:permission_id, :policy_id, :permission, :transaction_log_id, :record_log)');
+            $sql->bindValue(':permission_id', $permission_id);
+            $sql->bindValue(':policy_id', $policy_id);
+            $sql->bindValue(':permission', $permission);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($permission_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated permission.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated permission.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_role
+    # Purpose    : Updates role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_role($role_id, $role, $description, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $role_details = $this->get_role_details($role_id);
+
+            if(!empty($role_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $role_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_role(:role_id, :role, :description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':role', $role);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($role_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated role.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated role.');
+                                    
                         if($insert_transaction_log){
                             return true;
                         }
@@ -670,37 +905,331 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_policy
+    # Purpose    : Insert policy.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_policy($policy, $policy_description, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(3, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_policy(:id, :policy, :policy_description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':policy', $policy);
+            $sql->bindValue(':policy_description', $policy_description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 3, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted policy.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_permission
+    # Purpose    : Insert permission.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_permission($policy_id, $permission, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(4, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_permission(:id, :policy_id, :permission, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':policy_id', $policy_id);
+            $sql->bindValue(':permission', $permission);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 4, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted permission.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_role
+    # Purpose    : Insert role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_role($role, $description, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(5, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_role(:id, :role, :description, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':role', $role);
+            $sql->bindValue(':description', $description);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 5, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted role.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_permission_role
+    # Purpose    : Insert role permission.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_permission_role($role_id, $permission_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL insert_permission_role(:role_id, :permission_id, :record_log)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':permission_id', $permission_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
     #
-    # Name       : delete_job_applicant
-    # Purpose    : Delete job applicant.
+    # Name       : delete_policy
+    # Purpose    : Delete policy.
     #
     # Returns    : Number/String
     #
     # -------------------------------------------------------------
-    public function delete_job_applicant($applicant_id, $username){
+    public function delete_policy($policy_id, $username){
         if ($this->databaseConnection()) {
-            $job_applicant_details = $this->get_job_applicant_details($applicant_id);
-            $applicant_resume = $job_applicant_details[0]['APPLICANT_RESUME'];
-
-            $sql = $this->db_connection->prepare('CALL delete_job_applicant(:applicant_id)');
-            $sql->bindValue(':applicant_id', $applicant_id);
+            $sql = $this->db_connection->prepare('CALL delete_policy(:policy_id)');
+            $sql->bindValue(':policy_id', $policy_id);
         
-            if($sql->execute()){ 
-                if(!empty($applicant_resume)){
-                    if (unlink($applicant_resume)) {
-                        return true;
-                    }
-                    else {
-                        return $applicant_resume . ' cannot be deleted due to an error.';
-                    }
-                }
-                else{
-                    return true;
-                }
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_permission
+    # Purpose    : Delete all permission linked to policy.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_permission($policy_id, $username){
+        if ($this->databaseConnection()) {
+            $policy_details = $this->get_policy_details($policy_id);
+
+            $sql = $this->db_connection->prepare('CALL delete_all_permission(:policy_id)');
+            $sql->bindValue(':policy_id', $policy_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_permission
+    # Purpose    : Delete permission.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_permission($permission_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_permission(:permission_id)');
+            $sql->bindValue(':permission_id', $permission_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_role
+    # Purpose    : Delete role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_role($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_role(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_permission_role
+    # Purpose    : Delete assigned permissions to role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_permission_role($role_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_permission_role(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+        
+            if($sql->execute()){
+               return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -751,6 +1280,140 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_policy_details
+    # Purpose    : Gets the policy details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_policy_details($policy_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_policy_details(:policy_id)');
+            $sql->bindValue(':policy_id', $policy_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'POLICY' => $row['POLICY'],
+                        'POLICY_DESCRIPTION' => $row['POLICY_DESCRIPTION'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_permission_details
+    # Purpose    : Gets the permission details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_permission_details($permission_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_permission_details(:permission_id)');
+            $sql->bindValue(':permission_id', $permission_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'POLICY_ID' => $row['POLICY_ID'],
+                        'PERMISSION' => $row['PERMISSION'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_role_details
+    # Purpose    : Gets the role details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_role_details($role_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_role_details(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ROLE' => $row['ROLE'],
+                        'ROLE_DESCRIPTION' => $row['ROLE_DESCRIPTION'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_role_permission_details
+    # Purpose    : Gets the role permission details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_role_permission_details($role_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_role_permission_details(:role_id)');
+            $sql->bindValue(':role_id', $role_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'PERMISSION_ID' => $row['PERMISSION_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
 
@@ -763,7 +1426,7 @@ class Api{
     # Returns    : Date
     #
     # -------------------------------------------------------------
-    public function get_next_date($previous_date, $frequency){   
+    public function get_next_date($previous_date, $frequency){
         if($frequency == 'MONTHLY'){
             $date = $this->check_date('empty', $previous_date, '', 'Y-m-d', '+1 month', '', '');
         }
@@ -788,6 +1451,65 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_permission_count
+    # Purpose    : Gets the roles' sub permission count.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function get_permission_count($role_id, $permission_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL get_permission_count(:role_id, :permission_id)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':permission_id', $permission_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_system_parameter
+    # Purpose    : Gets the system parameter.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_system_parameter($parameter_id, $add){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL get_system_parameter(:parameter_id)');
+            $sql->bindValue(':parameter_id', $parameter_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                $parameter_number = $row['PARAMETER_NUMBER'] + $add;
+                $parameter_extension = $row['PARAMETER_EXTENSION'];
+
+                $response[] = array(
+                    'PARAMETER_NUMBER' => $parameter_number,
+                    'ID' => $parameter_extension . $parameter_number
+                );
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Check methods
     # -------------------------------------------------------------
 
@@ -804,7 +1526,7 @@ class Api{
             $response = array();
             $total = 0;
 
-            $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM tblroleuser WHERE USERNAME = :username');
+            $sql = $this->db_connection->prepare('SELECT ROLE_ID FROM global_role_user_account WHERE USERNAME = :username');
             $sql->bindValue(':username', $username);
 
             if($sql->execute()){

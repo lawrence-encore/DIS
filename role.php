@@ -4,11 +4,11 @@
     require('classes/api.php');
 
     $api = new Api;
-    $page_title = 'Policy';
+    $page_title = 'Role';
 
-    $page_access = $api->check_role_permissions($username, 2);
-	$add_policy = $api->check_role_permissions($username, 3);
-	$delete_policy = $api->check_role_permissions($username, 5);
+    $page_access = $api->check_role_permissions($username, 11);
+	$add_role = $api->check_role_permissions($username, 12);
+	$delete_role = $api->check_role_permissions($username, 14);
 
 	$check_user_account_status = $api->check_user_account_status($username);
 
@@ -32,7 +32,7 @@
     </head>
 
     <body data-sidebar="dark">
-        <?php require('views/_preloader.php'); ?>
+        <?php require('views/_preloader.php'); ?> 
 
         <div id="layout-wrapper">
             <?php 
@@ -64,20 +64,20 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Policy List</h4>
+                                                        <h4 class="card-title">Role List</h4>
                                                     </div>
                                                     <?php
-                                                        if($add_policy == 0 || $delete_policy == 0){
+                                                        if($add_role == 0 || $delete_role == 0){
 
-                                                            if($add_policy == 0){
-                                                                $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-policy"><i class="bx bx-plus label-icon"></i> Add</button>';
+                                                            if($add_role == 0){
+                                                                $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-role"><i class="bx bx-plus label-icon"></i> Add</button>';
                                                             }
                                                             else{
                                                                 $add = '';
                                                             }
 
-                                                            if($delete_policy == 0){
-                                                                $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-policy"><i class="bx bx-trash label-icon"></i> Delete</button>';
+                                                            if($delete_role == 0){
+                                                                $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-role"><i class="bx bx-trash label-icon"></i> Delete</button>';
                                                             }
                                                             else{
                                                                 $delete = '';
@@ -94,7 +94,7 @@
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="policy-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="role-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -102,8 +102,7 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Policy ID</th>
-                                                            <th class="all">Policy</th>
+                                                            <th class="all">Role</th>
                                                             <th class="all">Action</th>
                                                         </tr>
                                                     </thead>
@@ -132,6 +131,6 @@
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/policy.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/role.js?v=<?php echo rand(); ?>"></script>
     </body>
 </html>

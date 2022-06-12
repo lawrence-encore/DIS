@@ -6,10 +6,13 @@
     $api = new Api;
     $page_title = 'Dashboard';
 
+    $page_access = $api->check_role_permissions($username, 1);
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-
+        if($page_access != 0){
+            header('location: 404-page.php');
+        }
     }
     else{
         header('location: logout.php?logout');

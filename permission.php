@@ -4,17 +4,21 @@
     require('classes/api.php');
 
     $api = new Api;
-    $page_title = 'Policy';
+    $page_title = 'Permission';
 
-    $page_access = $api->check_role_permissions($username, 2);
-	$add_policy = $api->check_role_permissions($username, 3);
-	$delete_policy = $api->check_role_permissions($username, 5);
-
-	$check_user_account_status = $api->check_user_account_status($username);
+    $page_access = $api->check_role_permissions($username, 7);
+	$add_permission = $api->check_role_permissions($username, 8);
+	$delete_permission = $api->check_role_permissions($username, 10);
+    
+    $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        if($page_access != 0){
+        if($page_access != 0 || !isset($_GET['id']) || empty($_GET['id'])){
             header('location: 404-page.php');
+        }
+        else{
+            $id = $_GET['id'];
+            $policy_id = $api->decrypt_data($id);
         }
     }
     else{
@@ -32,7 +36,7 @@
     </head>
 
     <body data-sidebar="dark">
-        <?php require('views/_preloader.php'); ?>
+        <?php require('views/_preloader.php'); ?> 
 
         <div id="layout-wrapper">
             <?php 
@@ -50,7 +54,9 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Administrator</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="policy.php">Policy</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
+                                            <li class="breadcrumb-item" id="policy-id"><a href="javascript: void(0);"><?php echo $policy_id; ?></a></li>
                                         </ol>
                                     </div>
                                 </div>
@@ -64,20 +70,20 @@
                                             <div class="col-md-12">
                                                 <div class="d-flex align-items-start">
                                                     <div class="flex-grow-1 align-self-center">
-                                                        <h4 class="card-title">Policy List</h4>
+                                                        <h4 class="card-title">Permission List</h4>
                                                     </div>
                                                     <?php
-                                                        if($add_policy == 0 || $delete_policy == 0){
+                                                        if($add_permission == 0 || $delete_permission == 0){
 
-                                                            if($add_policy == 0){
-                                                                $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-policy"><i class="bx bx-plus label-icon"></i> Add</button>';
+                                                            if($add_permission == 0){
+                                                                $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-permission"><i class="bx bx-plus label-icon"></i> Add</button>';
                                                             }
                                                             else{
                                                                 $add = '';
                                                             }
 
-                                                            if($delete_policy == 0){
-                                                                $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-policy"><i class="bx bx-trash label-icon"></i> Delete</button>';
+                                                            if($delete_permission == 0){
+                                                                $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-permission"><i class="bx bx-trash label-icon"></i> Delete</button>';
                                                             }
                                                             else{
                                                                 $delete = '';
@@ -94,7 +100,7 @@
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-md-12">
-                                                <table id="policy-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                                <table id="permission-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
                                                     <thead>
                                                         <tr>
                                                             <th class="all">
@@ -102,12 +108,12 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Policy ID</th>
-                                                            <th class="all">Policy</th>
+                                                            <th class="all">Permission ID</th>
+                                                            <th class="all">Permission</th>
                                                             <th class="all">Action</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody></tbody>
+                                                    <tbody><tbody>
                                                 </table>
                                             </div>
                                         </div>       
@@ -132,6 +138,6 @@
         <script src="assets/libs/jquery-validation/js/jquery.validate.min.js"></script>
         <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
         <script src="assets/js/system.js?v=<?php echo rand(); ?>"></script>
-        <script src="assets/js/pages/policy.js?v=<?php echo rand(); ?>"></script>
+        <script src="assets/js/pages/permission.js?v=<?php echo rand(); ?>"></script>
     </body>
-</html>
+</html> 
