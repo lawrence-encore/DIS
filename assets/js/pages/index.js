@@ -19,7 +19,7 @@
                             var username = $('#username').val();
                             sessionStorage.setItem('username', username);
 
-                            window.location = 'dashboard.php';
+                            window.location = 'apps.php';
                         }
                         else{
                             if(response === 'Incorrect'){

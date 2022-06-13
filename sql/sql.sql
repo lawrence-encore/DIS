@@ -325,7 +325,7 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(100), IN transaction_log_id VARCHAR(500), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @role_id = role_id;
 	SET @role = role;
@@ -340,7 +340,7 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE insert_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(100), IN transaction_log_id VARCHAR(500), IN record_log VARCHAR(100))
+CREATE PROCEDURE insert_role(IN role_id VARCHAR(100), IN role VARCHAR(100), IN role_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
 BEGIN
 	SET @role_id = role_id;
 	SET @role = role;
@@ -412,8 +412,129 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE check_user_account_exist(IN username VARCHAR(50))
+BEGIN
+	SET @username = username;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_user_account WHERE USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @password = password;
+	SET @password_expiry_date = password_expiry_date;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	IF @password IS NULL OR @password = '' THEN
+		SET @query = 'UPDATE global_user_account SET TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	ELSE
+		SET @query = 'UPDATE global_user_account SET PASSWORD = @password, PASSWORD_EXPIRY_DATE = @password_expiry_date, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE USERNAME = @username';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_user_account(IN username VARCHAR(50), IN password VARCHAR(200), IN password_expiry_date DATE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @password = password;
+	SET @password_expiry_date = password_expiry_date;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_user_account (USERNAME, PASSWORD, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@username, @password, "ACTIVE", @password_expiry_date, 0, null, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_user_account_role(IN username VARCHAR(50), IN role_id VARCHAR(50), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @role_id = role_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_role_user_account (ROLE_ID, USERNAME, RECORD_LOG) VALUES(@role_id, @username, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_user_account_role(IN user_code VARCHAR(50))
+BEGIN
+	SET @user_code = user_code;
+
+	SET @query = 'DELETE FROM global_role_user_account WHERE USERNAME = @user_code';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_user_account_lock_status(IN username VARCHAR(50), IN transaction_type VARCHAR(10), IN last_failed_login DATE, IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @transaction_type = transaction_type;
+	SET @last_failed_login = last_failed_login;
+	SET @record_log = record_log;
+
+	IF @transaction_type = 'unlock' THEN
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 0, LAST_FAILED_LOGIN = null, RECORD_LOG = @record_log WHERE USERNAME = @username';
+	ELSE
+		SET @query = 'UPDATE global_user_account SET FAILED_LOGIN = 5, LAST_FAILED_LOGIN = @last_failed_login, RECORD_LOG = @record_log WHERE USERNAME = @username';
+    END IF;
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_user_account_status(IN username VARCHAR(50), IN USER_STATUS INT(1), IN record_log VARCHAR(100))
+BEGIN
+	SET @username = username;
+	SET @USER_STATUS = USER_STATUS;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_user_account SET USER_STATUS = @USER_STATUS, RECORD_LOG = @record_log WHERE USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_user_account_role_details(IN role_id VARCHAR(50), IN username VARCHAR(50))
+BEGIN
+	SET @role_id = role_id;
+	SET @username = username;
+
+	SET @query = 'SELECT ROLE_ID, USERNAME, RECORD_LOG FROM global_role_user_account WHERE ROLE_ID = @role_id OR USERNAME = @username';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_role_options()
+BEGIN
+	SET @query = 'SELECT ROLE_ID, ROLE FROM global_role ORDER BY ROLE';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Insert Transactions */
-INSERT INTO global_user_account (USERNAME, PASSWORD, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'ACTIVE', '2021-12-30', 0, null, 'TL-1');
+INSERT INTO global_user_account (USERNAME, PASSWORD, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Active', '2021-12-30', 0, null, 'TL-1');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('1', 'System Parameter', 'Parameter for system parameters.', '', 3, 'TL-2');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('2', 'Transaction Log', 'Parameter for transaction logs.', 'TL-', 4, 'TL-3');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('3', 'Policy', 'Parameter for policies.', '', 0, 'TL-4');

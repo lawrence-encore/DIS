@@ -4,8 +4,9 @@
     $general_setting_page = $api->check_role_permissions($username, 1);
     $policy_page = $api->check_role_permissions($username, 1);
     $role_page = $api->check_role_permissions($username, 11);
+    $user_account_page = $api->check_role_permissions($username, 16);
 
-    if($policy_page == 0 || $role_page == 0){
+    if($policy_page == 0 || $role_page == 0 || $user_account_page == 0){
         if($general_setting_page == 0){
             $menu .= '<li class="nav-item dropdown"><a href="general-setting.php" class="nav-link">General Setting</a></li>';
         }
@@ -16,6 +17,10 @@
 
         if($role_page == 0){
             $menu .= '<li class="nav-item dropdown"><a href="role.php" class="nav-link">Role</a></li>';
+        }
+
+        if($user_account_page == 0){
+            $menu .= '<li class="nav-item dropdown"><a href="user-account.php" class="nav-link">User Account</a></li>';
         }
     }
 ?>

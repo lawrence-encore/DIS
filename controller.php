@@ -254,6 +254,146 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit user account
+    else if($transaction == 'submit user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['employee_id']) && isset($_POST['user_code']) && !empty($_POST['user_code']) && isset($_POST['password']) && isset($_POST['role'])){
+            $username = $_POST['username'];
+            $employee_id = $_POST['employee_id'];
+            $user_code = $_POST['user_code'];
+            $password = $_POST['password'];
+            $roles = explode(',', $_POST['role']);
+            $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
+
+            if(!empty($password)){
+                $password = $api->encrypt_data($password);
+            }
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account = $api->update_user_account($user_code, $password, $password_expiry_date, $username);
+
+                if($update_user_account){
+                    $delete_all_role_users = $api->insert_user_account_role($user_code);
+
+                    if($delete_all_role_users){
+                        foreach($roles as $role){
+                            $insert_user_role = $api->insert_user_role($user_code, $role, $username);
+
+                            if(!$insert_user_role){
+                                $error = $insert_user_role;
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        $error = $delete_all_role_users;
+                    }                    
+                }
+                else{
+                    $error = $update_user_account;
+                }
+
+                if(empty($error)){
+                    echo 'Updated';
+                }
+                else{
+                    echo $error;
+                }
+            }
+            else{
+                $insert_user_account_role = $api->insert_user_account_role($user_code, $password, $password_expiry_date, $username);
+
+                if($insert_user_account_role){
+                    foreach($roles as $role){
+                        $insert_user_role = $api->insert_user_role($user_code, $role, $username);
+
+                        if(!$insert_user_role){
+                            $error = $insert_user_role;
+                            break;
+                        }
+                    }
+
+                    if(empty($error)){
+                        if(!empty($employee_id)){
+                            $update_employee_user_account = $api->update_employee_user_account($employee_id, $user_code, $username);
+
+                            if($update_employee_user_account){
+                                echo 'Inserted';
+                            }
+                            else{
+                                echo $update_employee_user_account;
+                            }
+                        }
+                        else{
+                            echo 'Inserted';
+                        }
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+                else{
+                    $error = $insert_user_account_role;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit user account update
+    else if($transaction == 'submit user account update'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code']) && isset($_POST['password']) && isset($_POST['role'])){
+            $username = $_POST['username'];
+            $user_code = $_POST['user_code'];
+            $password = $_POST['password'];
+            $roles = explode(',', $_POST['role']);
+            $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
+
+            if(!empty($password)){
+                $password = $api->encrypt_data($password);
+            }
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account = $api->update_user_account($user_code, $password, $password_expiry_date, $username);
+
+                if($update_user_account){
+                    $delete_all_role_users = $api->insert_user_account_role($user_code);
+
+                    if($delete_all_role_users){
+                        foreach($roles as $role){
+                            $insert_user_role = $api->insert_user_role($user_code, $role, $username);
+
+                            if(!$insert_user_role){
+                                $error = $insert_user_role;
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        $error = $delete_all_role_users;
+                    }
+                }
+                else{
+                    $error = $update_user_account;
+                }
+
+                if(empty($error)){
+                    echo 'Updated';
+                }
+                else{
+                    echo $error;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -455,6 +595,246 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #   Unlock transactions
+    # -------------------------------------------------------------
+
+    # Unlock user account
+    else if($transaction == 'unlock user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_code = $_POST['user_code'];
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account_lock_status = $api->update_user_account_lock_status($user_code, 'unlock', $system_date, $username);
+    
+                if($update_user_account_lock_status){
+                    echo 'Unlocked';
+                }
+                else{
+                    echo $update_user_account_lock_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Unlock multiple user account
+    else if($transaction == 'unlock multiple user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_codes = $_POST['user_code'];
+
+            foreach($user_codes as $user_code){
+                $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+                if($check_user_account_exist > 0){
+                    $update_user_account_lock_status = $api->update_user_account_lock_status($user_code, 'unlock', $system_date, $username);
+                                    
+                    if(!$update_user_account_lock_status){
+                        $error = $update_user_account_lock_status;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Unlocked';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #   Lock transactions
+    # -------------------------------------------------------------
+
+    # Lock user account
+    else if($transaction == 'lock user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_code = $_POST['user_code'];
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account_lock_status = $api->update_user_account_lock_status($user_code, 'lock', $system_date, $username);
+    
+                if($update_user_account_lock_status){
+                    echo 'Locked';
+                }
+                else{
+                    echo $update_user_account_lock_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Lock multiple user account
+    else if($transaction == 'lock multiple user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_codes = $_POST['user_code'];
+
+            foreach($user_codes as $user_code){
+                $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+                if($check_user_account_exist > 0){
+                    $update_user_account_lock_status = $api->update_user_account_lock_status($user_code, 'lock', $system_date, $username);
+                                    
+                    if(!$update_user_account_lock_status){
+                        $error = $update_user_account_lock_status;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Locked';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #   Activate transactions
+    # -------------------------------------------------------------
+
+    # Activate user account
+    else if($transaction == 'activate user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_code = $_POST['user_code'];
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account_status = $api->update_user_account_status($user_code, 1, $username);
+    
+                if($update_user_account_status){
+                    echo 'Activated';
+                }
+                else{
+                    echo $update_user_account_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Activate multiple user account
+    else if($transaction == 'activate multiple user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_codes = $_POST['user_code'];
+
+            foreach($user_codes as $user_code){
+                $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+                if($check_user_account_exist > 0){
+                    $update_user_account_status = $api->update_user_account_status($user_code, 1, $username);
+                                    
+                    if(!$update_user_account_status){
+                        $error = $update_user_account_status;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Activated';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+     
+    # -------------------------------------------------------------
+    #   Deactivate transactions
+    # -------------------------------------------------------------
+
+    # Deactivate user account
+    else if($transaction == 'deactivate user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_code = $_POST['user_code'];
+
+            $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+            if($check_user_account_exist > 0){
+                $update_user_account_status = $api->update_user_account_status($user_code, 0, $username);
+    
+                if($update_user_account_status){
+                    echo 'Deactivated';
+                }
+                else{
+                    echo $update_user_account_status;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Deactivate multiple user account
+    else if($transaction == 'deactivate multiple user account'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code'])){
+            $username = $_POST['username'];
+            $user_codes = $_POST['user_code'];
+
+            foreach($user_codes as $user_code){
+                $check_user_account_exist = $api->check_user_account_exist($user_code);
+
+                if($check_user_account_exist > 0){
+                    $update_user_account_status = $api->update_user_account_status($user_code, 0, $username);
+                                    
+                    if(!$update_user_account_status){
+                        $error = $update_user_account_status;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deactivated';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get details transactions
     # -------------------------------------------------------------
 
@@ -516,6 +896,65 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             for($i = 0; $i < count($role_permission_details); $i++) {
                 array_push($response, $role_permission_details[$i]['PERMISSION_ID']);
             }
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # User account details
+    else if($transaction == 'user account details'){
+        if(isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $roles = '';
+            $user_code = $_POST['user_code'];
+            $role_user_details = $api->get_user_account_role_details('', $user_code);
+
+            for($i = 0; $i < count($role_user_details); $i++) {
+                $roles .= $role_user_details[$i]['ROLE_ID'];
+
+                if($i != (count($role_user_details) - 1)){
+                    $roles .= ',';
+                }
+            }
+
+            $response[] = array(
+                'ROLES' => $roles
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # View user account details
+    else if($transaction == 'view user account details'){
+        if(isset($_POST['user_code']) && !empty($_POST['user_code'])){
+            $roles = '';
+            $user_code = $_POST['user_code'];
+            
+            $user_account_details = $api->get_user_account_details($user_code);
+            $role_user_details = $api->get_user_account_role_details('', $user_code);
+
+            for($i = 0; $i < count($role_user_details); $i++) {
+                $role_id = $role_user_details[$i]['ROLE_ID'];
+                $role_details = $api->get_role_details($role_id);
+                $roles .= $role_details[0]['ROLE'];
+
+                if($i != (count($role_user_details) - 1)){
+                    $roles .= ', ';
+                }
+            }
+
+            $account_status = $api->get_user_account_status($user_account_details[0]['USER_STATUS'])[0]['STATUS'];
+
+            $response[] = array(
+                'FILE_AS' => $user_code,
+                'ACTIVE' => $account_status,
+                'PASSWORD_EXPIRY_DATE' => $api->check_date('empty', $user_account_details[0]['PASSWORD_EXPIRY_DATE'], '', 'F d, Y', '', '', ''),
+                'FAILED_LOGIN' => $user_account_details[0]['FAILED_LOGIN'],
+                'LAST_FAILED_LOGIN' => $api->check_date('empty', $user_account_details[0]['LAST_FAILED_LOGIN'], '', 'F d, Y', '', '', ''),
+                'ROLES' => $roles
+            );
 
             echo json_encode($response);
         }

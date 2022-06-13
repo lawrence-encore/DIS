@@ -874,6 +874,166 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_user_account
+    # Purpose    : Updates user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account($user_code, $password, $password_expiry_date, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $user_account_details = $this->get_user_account_details($user_code);
+
+            if(!empty($user_account_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account(:user_code, :password, :password_expiry_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':user_code', $user_code);
+            $sql->bindValue(':password', $password);
+            $sql->bindValue(':password_expiry_date', $password_expiry_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($user_account_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated user account (' . $user_code . ').');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated user account (' . $user_code . ').');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_user_account_lock_status
+    # Purpose    : Updates user account lock status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account_lock_status($user_code, $transaction_type, $system_date, $username){
+        if ($this->databaseConnection()) {
+            $user_account_details = $this->get_user_account_details($user_code);
+            $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+
+            if($transaction_type == 'unlock'){
+                $record_log = 'ULCK->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Unlock';
+                $log = 'User ' . $username . ' unlocked user account (' . $user_code . ').';
+            }
+            else{
+                $record_log = 'LCK->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Lock';
+                $log = 'User ' . $username . ' locked user account (' . $user_code . ').';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account_lock_status(:user_code, :transaction_type, :system_date, :record_log)');
+            $sql->bindValue(':user_code', $user_code);
+            $sql->bindValue(':transaction_type', $transaction_type);
+            $sql->bindValue(':system_date', $system_date);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_type, $log);
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_user_account_status
+    # Purpose    : Updates user account status.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_user_account_status($user_code, $active, $username){
+        if ($this->databaseConnection()) {
+            $user_account_details = $this->get_user_account_details($user_code);
+            $transaction_log_id = $user_account_details[0]['TRANSACTION_LOG_ID'];
+
+            if($active){
+                $record_log = 'ACT->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Activate';
+                $log = 'User ' . $username . ' activated user account (' . $user_code . ').';
+            }
+            else{
+                $record_log = 'DACT->' . $username . '->' . date('Y-m-d h:i:s');
+                $log_type = 'Deactivated';
+                $log = 'User ' . $username . ' deactivated user account (' . $user_code . ').';
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_user_account_status(:user_code, :active, :record_log)');
+            $sql->bindValue(':user_code', $user_code);
+            $sql->bindValue(':active', $active);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, $log_type, $log);
+                                    
+                if($insert_transaction_log){
+                    return true;
+                }
+                else{
+                    return $insert_transaction_log;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -1118,6 +1278,82 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_user_account
+    # Purpose    : Insert user account.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_user_account($user_code, $password, $password_expiry_date, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_user_account_role(:user_code, :password, :password_expiry_date, :transaction_log_id, :record_log)');
+            $sql->bindValue(':user_code', $user_code);
+            $sql->bindValue(':password', $password);
+            $sql->bindValue(':password_expiry_date', $password_expiry_date);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update transaction log value
+                $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                if($update_system_parameter_value){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted user account.');
+                                 
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+     
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_user_account_role
+    # Purpose    : Insert user account role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_user_account_role($user_code, $role, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            $sql = $this->db_connection->prepare('CALL insert_user_account_role(:user_code, :role, :record_log)');
+            $sql->bindValue(':user_code', $user_code);
+            $sql->bindValue(':role', $role);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
 
@@ -1230,6 +1466,29 @@ class Api{
         
             if($sql->execute()){
                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_user_account_role
+    # Purpose    : Delete all user role.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_user_account_role($user_code){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_user_account_role(:user_code)');
+            $sql->bindValue(':user_code', $user_code);
+        
+            if($sql->execute()){
+                return true;
             }
             else{
                 return $sql->errorInfo()[2];
@@ -1414,6 +1673,40 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : get_user_account_role_details
+    # Purpose    : Gets the role user details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_user_account_role_details($role_id, $user_code){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_user_account_role_details(:role_id, :user_code)');
+            $sql->bindValue(':role_id', $role_id);
+            $sql->bindValue(':user_code', $user_code);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'ROLE_ID' => $row['ROLE_ID'],
+                        'USERNAME' => $row['USERNAME'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Get methods
     # -------------------------------------------------------------
 
@@ -1506,6 +1799,113 @@ class Api{
                 return $sql->errorInfo()[2];
             }
         }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_user_account_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_user_account_status($stat){
+        $response = array();
+
+        switch ($stat) {
+            case 'ACTIVE':
+                $status = 'Active';
+                $button_class = 'bg-success';
+                break;
+            default:
+                $status = 'Inactive';
+                $button_class = 'bg-danger';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_user_account_lock_status
+    # Purpose    : Returns the status, badge.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_user_account_lock_status($failed_login){
+        $response = array();
+
+        if ($failed_login >= 5) {
+            $status = 'Locked';
+            $button_class = 'bg-danger';
+        }
+        else{
+            $status = 'Unlocked';
+            $button_class = 'bg-success';
+        }
+
+        $response[] = array(
+            'STATUS' => $status,
+            'BADGE' => '<span class="badge '. $button_class .'">'. $status .'</span>'
+        );
+
+        return $response;
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_date_difference
+    # Purpose    : Returns the year, month and days difference.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_date_difference($date_1, $date_2){
+        $response = array();
+
+        $diff = abs(strtotime($date_2) - strtotime($date_1));
+
+        $years = floor($diff / (365 * 60 * 60 * 24));
+        $months = floor(($diff - $years * 365 * 60 * 60 * 24) / (30 * 60 * 60 * 24));
+        $days = floor(($diff - $years * 365 * 60 * 60 * 24 - $months * 30 * 60 * 60 * 24)/ (60 * 60 * 24));
+
+        if($years){
+            $years = $years . ' Year';
+        }
+        else{
+            $years = $years . ' Years';
+        }
+
+        if($months){
+            $months = $months . ' Month';
+        }
+        else{
+            $months = $months . ' Months';
+        }
+
+        if($days){
+            $days = $days . ' Day';
+        }
+        else{
+            $days = $days . ' Days';
+        }
+
+        $response[] = array(
+            'YEARS' => $years,
+            'MONTHS' => $months,
+            'DAYS' => $days
+        );
+
+        return $response;
     }
     # -------------------------------------------------------------
 
@@ -1847,6 +2247,42 @@ class Api{
         }
     }
     # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_role_options
+    # Purpose    : Generates role options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_role_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_role_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $role_id = $row['ROLE_ID'];
+                        $role = $row['ROLE'];
+    
+                        $option .= "<option value='". $role_id ."'>". $role ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 
 }
 
