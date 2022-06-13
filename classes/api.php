@@ -1776,6 +1776,78 @@ class Api{
     }
     # -------------------------------------------------------------
 
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_role_permission_form
+    # Purpose    : Generates permission check box.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_role_permission_form(){
+        if ($this->databaseConnection()) {
+            $counter = 0;
+            $column = '<div class="accordion" id="permission-accordion">';
+        
+            $sql = $this->db_connection->prepare('SELECT POLICY_ID, POLICY FROM global_policy ORDER BY POLICY');
+        
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $policy_id = $row['POLICY_ID'];
+                    $policy = $row['POLICY'];
+
+                    $column .= ' 
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading-'. $policy_id .'">
+                                            <button class="accordion-button fw-medium collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-'. $policy_id .'" aria-expanded="false" aria-controls="collapse-'. $policy_id .'">
+                                                '. $policy .'
+                                            </button>
+                                        </h2>
+                                        <div id="collapse-'. $policy_id .'" class="accordion-collapse collapse" aria-labelledby="heading-'. $policy_id .'" data-bs-parent="#permission-accordion">
+                                            <div class="accordion-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered mb-0">
+                                                        <tbody>';
+                                                        
+                                                        $sql2 = $this->db_connection->prepare('SELECT PERMISSION_ID, PERMISSION FROM global_permission WHERE POLICY_ID = :policy_id ORDER BY PERMISSION_ID');
+                                                        $sql2->bindValue(':policy_id', $policy_id);
+                                    
+                                                        if($sql2->execute()){
+                                                            while($res = $sql2->fetch()){
+                                                                $permission_id = $res['PERMISSION_ID'];
+                                                                $permission = $res['PERMISSION'];
+                                    
+                                                                $column .= '<tr>
+                                                                    <td><label class="form-check-label" for="'. $permission_id .'">'. $permission .'</label></td>
+                                                                    <td>
+                                                                        <div class="form-check form-switch mb-3">
+                                                                            <input class="form-check-input role-permissions" type="checkbox" id="'. $permission_id .'" value="'. $permission_id .'">
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>';
+                                                            }
+                                                        }
+
+                                            $column .= '</tbody>   
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                               ';
+                }
+
+                $column .= '</div>';
+
+                return $column;
+            }
+            else{
+                return $sql->errorInfo();
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
 }
 
 ?>

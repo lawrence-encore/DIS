@@ -22,21 +22,21 @@
                             </a>
                         </div>
 
-                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
+                        <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
                             <i class="fa fa-fw fa-bars"></i>
                         </button>
 
                         <div class="dropdown dropdown-mega d-none d-lg-block ms-2">
                             <button type="button" class="btn header-item waves-effect" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
-                                <span key="t-megamenu">Modules</span>
+                                <span key="t-megamenu">Mega Menu</span>
                                 <i class="mdi mdi-chevron-down"></i> 
                             </button>
                             <div class="dropdown-menu dropdown-megamenu">
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-8">
     
                                         <div class="row">
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <h5 class="font-size-14" key="t-ui-components">UI Components</h5>
                                                 <ul class="list-unstyled megamenu-list">
                                                     <li>
@@ -63,7 +63,7 @@
                                                 </ul>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <h5 class="font-size-14" key="t-applications">Applications</h5>
                                                 <ul class="list-unstyled megamenu-list">
                                                     <li>
@@ -87,7 +87,7 @@
                                                 </ul>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <h5 class="font-size-14" key="t-extra-pages">Extra Pages</h5>
                                                 <ul class="list-unstyled megamenu-list">
                                                     <li>
@@ -116,7 +116,44 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-sm-4">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <h5 class="font-size-14" key="t-ui-components">UI Components</h5>
+                                                <ul class="list-unstyled megamenu-list">
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-lightbox">Lightbox</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-range-slider">Range Slider</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-sweet-alert">Sweet Alert</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-rating">Rating</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-forms">Forms</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-tables">Tables</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" key="t-charts">Charts</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <div>
+                                                    <img src="assets/images/megamenu-img.png" alt="" class="img-fluid mx-auto d-block">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -125,19 +162,18 @@
 
                         <div class="dropdown d-inline-block d-lg-none ms-2">
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="mdi mdi-magnify"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
                                 aria-labelledby="page-header-search-dropdown">
-        
+                    
                                 <form class="p-3">
                                     <div class="form-group m-0">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                                            </div>
+                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Search input">
+                                
+                                            <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>s
                                         </div>
                                     </div>
                                 </form>
@@ -146,12 +182,52 @@
 
                         <div class="dropdown d-none d-lg-inline-block ms-1">
                             <button type="button" class="btn header-item noti-icon waves-effect"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="bx bx-customize"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                                 <div class="px-lg-2">
-                                    
+                                    <div class="row g-0">
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/github.png" alt="Github">
+                                                <span>GitHub</span>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/bitbucket.png" alt="bitbucket">
+                                                <span>Bitbucket</span>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/dribbble.png" alt="dribbble">
+                                                <span>Dribbble</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="row no-gutters">
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/dropbox.png" alt="dropbox">
+                                                <span>Dropbox</span>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/mail_chimp.png" alt="mail_chimp">
+                                                <span>Mail Chimp</span>
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="dropdown-icon-item" href="#">
+                                                <img src="assets/images/brands/slack.png" alt="slack">
+                                                <span>Slack</span>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +240,7 @@
 
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="bx bx-bell bx-tada"></i>
                                 <span class="badge bg-danger rounded-pill">3</span>
                             </button>
@@ -267,7 +343,7 @@
                                 <a class="dropdown-item text-danger" href="#"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
                             </div>
                         </div>
-
+            
                     </div>
                 </div>
             </header>

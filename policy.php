@@ -6,11 +6,11 @@
     $api = new Api;
     $page_title = 'Policy';
 
-    $page_access = $api->check_role_permissions($username, 2);
-	$add_policy = $api->check_role_permissions($username, 3);
-	$delete_policy = $api->check_role_permissions($username, 5);
-
-	$check_user_account_status = $api->check_user_account_status($username);
+    $page_access = $api->check_role_permissions($username, 1);
+    $add_policy = $api->check_role_permissions($username, 8);
+	$delete_policy = $api->check_role_permissions($username, 10);
+    
+    $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
         if($page_access != 0){
@@ -31,14 +31,17 @@
         <?php require('views/_required_css.php'); ?>
     </head>
 
-    <body data-sidebar="dark">
+    <body data-topbar="dark" data-layout="horizontal">
+
         <?php require('views/_preloader.php'); ?>
 
         <div id="layout-wrapper">
+
             <?php 
                 require('views/_top_bar.php');
-                require('views/_menu.php'); 
+                require('views/_settings_menu.php');
             ?>
+
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
@@ -48,7 +51,7 @@
                                     <h4 class="mb-sm-0 font-size-18"><?php echo $page_title; ?></h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Administrator</a></li>
+                                            <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
@@ -56,6 +59,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="card">
@@ -119,8 +123,8 @@
                 </div>
 
                 <?php require('views/_footer.php'); ?>
-               
             </div>
+
         </div>
 
         <?php require('views/_script.php'); ?>

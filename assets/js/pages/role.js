@@ -115,6 +115,14 @@ function initialize_click_events(){
         generate_modal('role form', 'Role', 'R' , '1', '1', 'form', 'role-form', '0', username);
     });
 
+    $(document).on('click','.update-role-permission',function() {
+        var role_id = $(this).data('role-id');
+
+        sessionStorage.setItem('role_id', role_id);
+        
+        generate_modal('role permission form', 'Role Permission', 'LG' , '1', '1', 'form', 'role-permission-form', '0', username);
+    });
+
     $(document).on('click','.assign-permission-role',function() {
         var role_id = $(this).data('role-id');
         

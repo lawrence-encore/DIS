@@ -123,6 +123,12 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                             </div>';
             }
+            else if($form_type == 'role permission form'){
+                $form .= '<div class="row">
+                                <input type="hidden" id="role_id" name="role_id">
+                                '. $api->generate_role_permission_form() .'
+                            </div>';
+            }
 
             $form .= '</form>';
 
@@ -194,7 +200,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     $policy_id_encrypted = $api->encrypt_data($policy_id);
 
                     if($permission_page == 0){
-                        $permission = '<a href="permission.php?id='. $policy_id_encrypted .'" class="btn btn-warning waves-effect waves-light" title="View Permission">
+                        $permission = '<a href="permission.php?id='. $policy_id_encrypted .'" class="btn btn-success waves-effect waves-light" title="View Permission">
                                     <i class="bx bx-list-check font-size-16 align-middle"></i>
                                 </a>';
                     }
@@ -329,7 +335,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             $update_role = $api->check_role_permissions($username, 13);
             $delete_role = $api->check_role_permissions($username, 14);
             $view_transaction_log = $api->check_role_permissions($username, 15);
-            $role_permission_page = $api->check_role_permissions($username, 16);
+            $update_role_permission = $api->check_role_permissions($username, 16);
 
             $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID FROM global_role');
 
@@ -359,10 +365,10 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $delete = '';
                     }
 
-                    if($role_permission_page == 0){
-                        $permission = '<a href="role-permission.php?id='. $role_id_encrypted .'" class="btn btn-warning waves-effect waves-light" title="View Permission">
-                                    <i class="bx bx-list-check font-size-16 align-middle"></i>
-                                </a>';
+                    if($update_role_permission == 0){
+                        $permission = '<button type="button" class="btn btn-success waves-effect waves-light update-role-permission" data-role-id="'. $role_id .'" title="Edit Role permission">
+                                        <i class="bx bx-list-check font-size-16 align-middle"></i>
+                                    </button>';
                     }
                     else{
                         $permission = '';

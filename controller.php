@@ -233,7 +233,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                         $insert_transaction_log = $api->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated role permission.');
                                     
                         if($insert_transaction_log){
-                            echo 'Assigned';
+                            echo 'Updated';
                         }
                         else{
                             return $insert_transaction_log;
