@@ -7,13 +7,13 @@
     $page_title = 'Policy';
 
     $page_access = $api->check_role_permissions($username, 1);
-    $add_policy = $api->check_role_permissions($username, 8);
-	$delete_policy = $api->check_role_permissions($username, 10);
+    $add_policy = $api->check_role_permissions($username, 2);
+	$delete_policy = $api->check_role_permissions($username, 4);
     
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        if($page_access != 0){
+        if($page_access == 0){
             header('location: 404-page.php');
         }
     }
@@ -53,6 +53,7 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">User Access</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
                                     </div>
@@ -71,16 +72,16 @@
                                                         <h4 class="card-title">Policy List</h4>
                                                     </div>
                                                     <?php
-                                                        if($add_policy == 0 || $delete_policy == 0){
+                                                        if($add_policy > 0 || $delete_policy > 0){
 
-                                                            if($add_policy == 0){
+                                                            if($add_policy > 0){
                                                                 $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-policy"><i class="bx bx-plus label-icon"></i> Add</button>';
                                                             }
                                                             else{
                                                                 $add = '';
                                                             }
 
-                                                            if($delete_policy == 0){
+                                                            if($delete_policy > 0){
                                                                 $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-policy"><i class="bx bx-trash label-icon"></i> Delete</button>';
                                                             }
                                                             else{

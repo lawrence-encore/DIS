@@ -32,10 +32,10 @@ function initialize_user_account_table(datatable_name, buttons = false, show_all
 
     var column_definition = [
         { 'width': '1%','bSortable': false, 'aTargets': 0 },
-        { 'width': '39%', 'aTargets': 1 },
-        { 'width': '10%', 'aTargets': 2 },
-        { 'width': '10%', 'aTargets': 3 },
-        { 'width': '25%', 'aTargets': 4 },
+        { 'width': '24%', 'aTargets': 1 },
+        { 'width': '15%', 'aTargets': 2 },
+        { 'width': '15%', 'aTargets': 3 },
+        { 'width': '30%', 'aTargets': 4 },
         { 'width': '20%','bSortable': false, 'aTargets': 5 },
     ];
 
@@ -130,7 +130,7 @@ function initialize_click_events(){
 
         sessionStorage.setItem('user_code', user_code);
         
-        generate_modal('user account update form', 'User Account', 'R' , '1', '1', 'form', 'user-account-update-form', '0', username);
+        generate_modal('user account form', 'User Account', 'R' , '1', '1', 'form', 'user-account-form', '0', username);
     });
 
     $(document).on('click','#password-addon',function() {

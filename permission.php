@@ -7,13 +7,13 @@
     $page_title = 'Permission';
 
     $page_access = $api->check_role_permissions($username, 1);
-    $add_permission = $api->check_role_permissions($username, 8);
-	$delete_permission = $api->check_role_permissions($username, 10);
+    $add_permission = $api->check_role_permissions($username, 7);
+	$delete_permission = $api->check_role_permissions($username, 9);
     
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        if($page_access != 0 || !isset($_GET['id']) || empty($_GET['id'])){
+        if($page_access == 0 || !isset($_GET['id']) || empty($_GET['id'])){
             header('location: 404-page.php');
         }
         else{
@@ -57,6 +57,7 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">User Access</a></li>
                                             <li class="breadcrumb-item"><a href="policy.php">Policy</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                             <li class="breadcrumb-item" id="policy-id"><a href="javascript: void(0);"><?php echo $policy_id; ?></a></li>
@@ -77,16 +78,16 @@
                                                         <h4 class="card-title">Permission List</h4>
                                                     </div>
                                                     <?php
-                                                        if($add_permission == 0 || $delete_permission == 0){
+                                                        if($add_permission > 0 || $delete_permission > 0){
 
-                                                            if($add_permission == 0){
+                                                            if($add_permission > 0){
                                                                 $add = '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-permission"><i class="bx bx-plus label-icon"></i> Add</button>';
                                                             }
                                                             else{
                                                                 $add = '';
                                                             }
 
-                                                            if($delete_permission == 0){
+                                                            if($delete_permission > 0){
                                                                 $delete = '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple" id="delete-permission"><i class="bx bx-trash label-icon"></i> Delete</button>';
                                                             }
                                                             else{

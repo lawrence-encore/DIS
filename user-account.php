@@ -6,17 +6,17 @@
     $api = new Api;
     $page_title = 'User Account';
 
-    $page_access = $api->check_role_permissions($username, 16);
-    $add_user_account = $api->check_role_permissions($username, 17);
-	$lock_user_account = $api->check_role_permissions($username, 19);
-	$unlock_user_account = $api->check_role_permissions($username, 20);
-	$activate_user_account = $api->check_role_permissions($username, 21);
-	$deactivate_user_account = $api->check_role_permissions($username, 22);
+    $page_access = $api->check_role_permissions($username, 17);
+    $add_user_account = $api->check_role_permissions($username, 18);
+	$lock_user_account = $api->check_role_permissions($username, 20);
+	$unlock_user_account = $api->check_role_permissions($username, 21);
+	$activate_user_account = $api->check_role_permissions($username, 22);
+	$deactivate_user_account = $api->check_role_permissions($username, 23);
     
     $check_user_account_status = $api->check_user_account_status($username);
 
     if($check_user_account_status){
-        if($page_access != 0){
+        if($page_access == 0){
             header('location: 404-page.php');
         }
     }
@@ -58,6 +58,7 @@
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="apps.php">Apps</a></li>
                                             <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                            <li class="breadcrumb-item"><a href="javascript: void(0);">User Access</a></li>
                                             <li class="breadcrumb-item active"><?php echo $page_title; ?></li>
                                         </ol>
                                     </div>
@@ -77,25 +78,25 @@
                                                     </div>
                                                     <div class="d-flex gap-2">
                                                         <?php
-                                                            if($add_user_account == 0 || $lock_user_account == 0 || $unlock_user_account == 0 || $activate_user_account == 0 || $deactivate_user_account == 0){
+                                                            if($add_user_account > 0 || $lock_user_account > 0 || $unlock_user_account > 0 || $activate_user_account > 0 || $deactivate_user_account > 0){
 
-                                                                if($add_user_account == 0){
+                                                                if($add_user_account > 0){
                                                                     echo '<button type="button" class="btn btn-primary waves-effect btn-label waves-light" id="add-user-account"><i class="bx bx-plus label-icon"></i> Add</button>';
                                                                 }
 
-                                                                if($lock_user_account == 0){
+                                                                if($lock_user_account > 0){
                                                                     echo '<button type="button" class="btn btn-warning waves-effect btn-label waves-light d-none multiple-lock" id="lock-user-account"><i class="bx bx-lock-alt label-icon"></i> Lock</button>';
                                                                 }
 
-                                                                if($unlock_user_account == 0){
+                                                                if($unlock_user_account > 0){
                                                                     echo '<button type="button" class="btn btn-info waves-effect btn-label waves-light d-none multiple-unlock" id="unlock-user-account"><i class="bx bx-lock-open-alt label-icon"></i> Unlock</button>';
                                                                 }
 
-                                                                if($activate_user_account == 0){
+                                                                if($activate_user_account > 0){
                                                                     echo '<button type="button" class="btn btn-success waves-effect btn-label waves-light d-none multiple-activate" id="activate-user-account"><i class="bx bx bx-user-check label-icon"></i> Activate</button>';
                                                                 }
 
-                                                                if($deactivate_user_account == 0){
+                                                                if($deactivate_user_account > 0){
                                                                     echo '<button type="button" class="btn btn-danger waves-effect btn-label waves-light d-none multiple-deactivate" id="deactivate-user-account"><i class="bx bx bx-user-check label-icon"></i> Deactivate</button>';
                                                                 }
                                                             }
@@ -127,8 +128,8 @@
 
                                                                 <select class="form-control filter-select2" id="filter_user_account_status">
                                                                     <option value="">All User Account Status</option>
-                                                                    <option value="0">Inactive</option>
-                                                                    <option value="1">Active</option>
+                                                                    <option value="INACTIVE">Inactive</option>
+                                                                    <option value="ACTIVE">Active</option>
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
@@ -158,7 +159,7 @@
                                                                     <input class="form-check-input" id="datatable-checkbox" type="checkbox">
                                                                 </div>
                                                             </th>
-                                                            <th class="all">Employee</th>
+                                                            <th class="all">User Account</th>
                                                             <th class="all">Account Status</th>
                                                             <th class="all">Lock Status</th>
                                                             <th class="all">Password Expiry Date</th>

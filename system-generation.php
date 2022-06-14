@@ -131,15 +131,18 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
             else if($form_type == 'user account form'){
                 $form .= '<div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
+                                    <input type="hidden" id="update" value="0">
                                     <label for="user_code" class="form-label">Username <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="user_code" name="user_code" maxlength="50">
                                 </div>
                             </div>
-                            <div class="col-md-6 ">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                    <label for="password" class="form-label">Password</label>
                                     <div class="input-group auth-pass-inputgroup">
                                         <input type="password" id="password" name="password" class="form-control" aria-label="Password" aria-describedby="password-addon">
                                         <button class="btn btn-light" type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
@@ -156,6 +159,166 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                         </select>
                                     </div>
                                 </div>
+                        </div>';
+            }
+            else if($form_type == 'system parameter form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="parameter_id" name="parameter_id">
+                                    <label for="parameter" class="form-label">Parameter <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="parameter" name="parameter" maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="extension" class="form-label">Extension</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="extension" name="extension" maxlength="10">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="parameter_number" class="form-label">Number</label>
+                                    <input id="parameter_number" name="parameter_number" class="form-control" type="number" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="parameter_description" class="form-label">Parameter Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control form-maxlength" id="parameter_description" name="parameter_description" maxlength="100" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>';
+                
+            }
+            else if($form_type == 'system code form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">System Type <span class="text-danger">*</span></label>
+                                    <select class="form-control form-select2" id="system_type" name="system_type">
+                                    <option value="">--</option>';
+                                    $form .= $api->generate_system_code_options('SYSTYPE');
+                                    $form .='</select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="system_code" class="form-label">System Code <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="system_code" name="system_code" maxlength="20">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="system_description" class="form-label">System Description <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="system_description" name="system_description" maxlength="100">
+                                    </div>
+                                </div>
+                            </div>';
+            }
+            else if($form_type == 'upload setting form'){
+                $form .= '<div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="upload_setting" class="form-label">Upload Setting <span class="text-danger">*</span></label>
+                                        <input type="hidden" id="upload_setting_id" name="upload_setting_id">
+                                        <input type="text" class="form-control form-maxlength" autocomplete="off" id="upload_setting" name="upload_setting" maxlength="200">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <input type="hidden" id="settingid" name="settingid">
+                                        <label for="max_file_size" class="form-label">Max File Size (Megabytes) <span class="text-danger">*</span></label>
+                                        <input id="max_file_size" name="max_file_size" class="form-control" type="number" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="file_type" class="form-label">Allowed File Type <span class="text-danger">*</span></label>
+                                        <select class="form-control form-select2" multiple="multiple" id="file_type" name="file_type">
+                                            '. $api->generate_system_code_options('FILETYPE') .'
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                        <textarea class="form-control form-maxlength" id="description" name="description" maxlength="200" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>';
+            }
+            else if($form_type == 'company form'){
+                $form .= '<div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <input type="hidden" id="company_id" name="company_id">
+                                    <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="mb-3">
+                                    <label for="tax_id" class="form-label">Tax ID</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="tax_id" name="tax_id" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="company_logo" class="form-label">Company Logo</label><br/>
+                                    <input class="form-control" type="file" name="company_logo" id="company_logo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="street_1" class="form-label">Street 1</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_1" name="street_1" maxlength="200">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="street_2" class="form-label">Street 2</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_2" name="street_2" maxlength="200">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="mobile" class="form-label">Mobile Number</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="telephone" class="form-label">Telephone</label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="telephone" class="form-label">Website</label>
+                                    <input type="url" class="form-control form-maxlength" autocomplete="off" id="website" name="website" maxlength="100">
+                                </div>
+                            </div>
                         </div>';
             }
 
@@ -177,12 +340,59 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             $value = $_POST['value'];
             $element = '';
 
-            if($element_type == 'system parameter details'){
+            if($element_type == 'user account details'){
+                $element = '<table class="table table-nowrap mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Username :</th>
+                                        <td id="user_code"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">User Acount Status :</th>
+                                        <td id="active"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Password Expiry Date :</th>
+                                        <td id="password_expiry_date"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Failed Login :</th>
+                                        <td id="failed_login"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Last Failed Login :</th>
+                                        <td id="last_failed_login"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Roles :</th>
+                                        <td id="roles"></td>
+                                    </tr>
+                                </tbody>
+                            </table>';
+            }
+            else if($element_type == 'transaction log'){
+                $element = '<table id="transaction-log-datatable" class="table table-bordered align-middle mb-0 table-hover table-striped dt-responsive nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th class="all">Log Type</th>
+                                        <th class="all">Log</th>
+                                        <th class="all">Log Date</th>
+                                        <th class="all">Log By</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                            </table>';
+            }
+            else if($element_type == 'system parameter details'){
                 $element = '<table class="table table-nowrap mb-0">
                                 <tbody>
                                     <tr>
                                         <th scope="row">Parameter :</th>
                                         <td id="parameter"></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Parameter Description :</th>
+                                        <td id="parameter_description"></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Extension :</th>
@@ -209,14 +419,48 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
     #   Generate table functions
     # -------------------------------------------------------------
 
+    # Transaction log table
+    else if($type == 'transaction log table'){
+        if(isset($_POST['transaction_log_id']) && !empty($_POST['transaction_log_id'])){
+            if ($api->databaseConnection()) {
+                $transaction_log_id = $_POST['transaction_log_id'];
+    
+                $sql = $api->db_connection->prepare('SELECT USERNAME, LOG_TYPE, LOG_DATE, LOG FROM global_transaction_log WHERE TRANSACTION_LOG_ID = :transaction_log_id');
+                $sql->bindValue(':transaction_log_id', $transaction_log_id);
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $username = $row['USERNAME'];
+                        $log_type = $row['LOG_TYPE'];
+                        $log = $row['LOG'];
+                        $log_date = $api->check_date('empty', $row['LOG_DATE'], '', 'm/d/Y h:i:s a', '', '', '');
+    
+                        $response[] = array(
+                            'LOG_TYPE' => $log_type,
+                            'LOG' => $log,
+                            'LOG_DATE' => $log_date,
+                            'LOG_BY' => $username
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # Policy table
     else if($type == 'policy table'){
         if ($api->databaseConnection()) {
             # Get permission
-            $update_policy = $api->check_role_permissions($username, 4);
-            $delete_policy = $api->check_role_permissions($username, 5);
-            $view_transaction_log = $api->check_role_permissions($username, 6);
-            $permission_page = $api->check_role_permissions($username, 7);
+            $update_policy = $api->check_role_permissions($username, 3);
+            $delete_policy = $api->check_role_permissions($username, 4);
+            $view_transaction_log = $api->check_role_permissions($username, 5);
+            $permission_page = $api->check_role_permissions($username, 6);
 
             $sql = $api->db_connection->prepare('SELECT POLICY_ID, POLICY, POLICY_DESCRIPTION, TRANSACTION_LOG_ID FROM global_policy');
 
@@ -228,7 +472,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     $transaction_log_id = $row['TRANSACTION_LOG_ID'];
                     $policy_id_encrypted = $api->encrypt_data($policy_id);
 
-                    if($permission_page == 0){
+                    if($permission_page > 0){
                         $permission = '<a href="permission.php?id='. $policy_id_encrypted .'" class="btn btn-success waves-effect waves-light" title="View Permission">
                                     <i class="bx bx-list-check font-size-16 align-middle"></i>
                                 </a>';
@@ -237,7 +481,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $permission = '';
                     }
 
-                    if($update_policy == 0){
+                    if($update_policy > 0){
                         $update = '<button type="button" class="btn btn-info waves-effect waves-light update-policy" data-policy-id="'. $policy_id .'" title="Edit Policy">
                                         <i class="bx bx-pencil font-size-16 align-middle"></i>
                                     </button>';
@@ -246,7 +490,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $update = '';
                     }
 
-                    if($delete_policy == 0){
+                    if($delete_policy > 0){
                         $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-policy" data-policy-id="'. $policy_id .'" title="Delete Policy">
                             <i class="bx bx-trash font-size-16 align-middle"></i>
                         </button>';
@@ -255,7 +499,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $delete = '';
                     }
 
-                    if($view_transaction_log == 0 && !empty($transaction_log_id)){
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
                         $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
                                                 <i class="bx bx-detail font-size-16 align-middle"></i>
                                             </button>';
@@ -296,7 +540,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
 
                 # Get permission
                 $update_permission = $api->check_role_permissions($username, 8);
-                $delete_permission = $api->check_role_permissions($username, 10);
+                $delete_permission = $api->check_role_permissions($username, 9);
                 $view_transaction_log = $api->check_role_permissions($username, 10);
     
                 $sql = $api->db_connection->prepare('SELECT PERMISSION_ID, PERMISSION, TRANSACTION_LOG_ID FROM global_permission WHERE POLICY_ID = :policy_id ORDER BY PERMISSION_ID');
@@ -308,7 +552,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $permission = $row['PERMISSION'];
                         $transaction_log_id = $row['TRANSACTION_LOG_ID'];
     
-                        if($update_permission == 0){
+                        if($update_permission > 0){
                             $update = '<button type="button" class="btn btn-info waves-effect waves-light update-permission" data-permission-id="'. $permission_id .'" title="Edit Permission">
                                             <i class="bx bx-pencil font-size-16 align-middle"></i>
                                         </button>';
@@ -317,7 +561,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             $update = '';
                         }
     
-                        if($delete_permission == 0){
+                        if($delete_permission > 0){
                             $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-permission" data-permission-id="'. $permission_id .'" title="Delete Permission">
                                             <i class="bx bx-trash font-size-16 align-middle"></i>
                                         </button>';
@@ -326,7 +570,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             $delete = '';
                         }
 
-                        if($view_transaction_log == 0 && !empty($transaction_log_id)){
+                        if($view_transaction_log > 0 && !empty($transaction_log_id)){
                             $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
                                                     <i class="bx bx-detail font-size-16 align-middle"></i>
                                                 </button>';
@@ -363,8 +607,8 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             # Get permission
             $update_role = $api->check_role_permissions($username, 13);
             $delete_role = $api->check_role_permissions($username, 14);
-            $view_transaction_log = $api->check_role_permissions($username, 15);
-            $update_role_permission = $api->check_role_permissions($username, 16);
+            $update_role_permission = $api->check_role_permissions($username, 15);
+            $view_transaction_log = $api->check_role_permissions($username, 16);
 
             $sql = $api->db_connection->prepare('SELECT ROLE_ID, ROLE, ROLE_DESCRIPTION, TRANSACTION_LOG_ID FROM global_role');
 
@@ -376,7 +620,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                     $transaction_log_id = $row['TRANSACTION_LOG_ID'];
                     $role_id_encrypted = $api->encrypt_data($role_id);
 
-                    if($update_role == 0){
+                    if($update_role > 0){
                         $update = '<button type="button" class="btn btn-info waves-effect waves-light update-role" data-role-id="'. $role_id .'" title="Edit Role">
                                         <i class="bx bx-pencil font-size-16 align-middle"></i>
                                     </button>';
@@ -385,7 +629,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $update = '';
                     }
 
-                    if($delete_role == 0 && $role_id != 'RL-1'){
+                    if($delete_role > 0 && $role_id != 'RL-1'){
                         $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-role" data-role-id="'. $role_id .'" title="Delete Role">
                                     <i class="bx bx-trash font-size-16 align-middle"></i>
                                 </button>';
@@ -394,7 +638,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $delete = '';
                     }
 
-                    if($update_role_permission == 0){
+                    if($update_role_permission > 0){
                         $permission = '<button type="button" class="btn btn-success waves-effect waves-light update-role-permission" data-role-id="'. $role_id .'" title="Edit Role permission">
                                         <i class="bx bx-list-check font-size-16 align-middle"></i>
                                     </button>';
@@ -410,7 +654,7 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         $check_box = '';
                     }
 
-                    if($view_transaction_log == 0 && !empty($transaction_log_id)){
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
                         $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
                                                 <i class="bx bx-detail font-size-16 align-middle"></i>
                                             </button>';
@@ -445,12 +689,12 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
         if(isset($_POST['filter_user_account_lock_status']) && isset($_POST['filter_user_account_status']) && isset($_POST['filter_start_date']) && isset($_POST['filter_end_date'])){
             if ($api->databaseConnection()) {
                 # Get permission
-                $update_user_account = $api->check_role_permissions($username, 145);
-                $lock_user_account = $api->check_role_permissions($username, 146);
-                $unlock_user_account = $api->check_role_permissions($username, 147);
-                $activate_user_account = $api->check_role_permissions($username, 148);
-                $deactivate_user_account = $api->check_role_permissions($username, 149);
-                $view_transaction_log = $api->check_role_permissions($username, 150);
+                $update_user_account = $api->check_role_permissions($username, 19);
+                $lock_user_account = $api->check_role_permissions($username, 20);
+                $unlock_user_account = $api->check_role_permissions($username, 21);
+                $activate_user_account = $api->check_role_permissions($username, 22);
+                $deactivate_user_account = $api->check_role_permissions($username, 23);
+                $view_transaction_log = $api->check_role_permissions($username, 24);
 
                 $filter_user_account_lock_status = $_POST['filter_user_account_lock_status'];
                 $filter_user_account_status = $_POST['filter_user_account_status'];
@@ -599,6 +843,290 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                 else{
                     echo $sql->errorInfo()[2];
                 }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System parameter table
+    else if($type == 'system parameter table'){
+        if ($api->databaseConnection()) {
+            # Get permission
+            $update_system_parameter = $api->check_role_permissions($username, 21);
+            $delete_system_parameter = $api->check_role_permissions($username, 22);
+            $view_transaction_log = $api->check_role_permissions($username, 23);
+
+            $sql = $api->db_connection->prepare('SELECT PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, TRANSACTION_LOG_ID FROM global_system_parameters ORDER BY PARAMETER_ID');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $parameter_id = $row['PARAMETER_ID'];
+                    $parameter = $row['PARAMETER'];
+                    $parameter_description = $row['PARAMETER_DESCRIPTION'];
+                    $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+
+                    if($update_system_parameter > 0){
+                        $update = '<button type="button" class="btn btn-info waves-effect waves-light update-system-parameter" data-parameter-id="'. $parameter_id .'" title="Edit System Parameter">
+                                        <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                    </button>';
+                    }
+                    else{
+                        $update = '';
+                    }
+
+                    if($delete_system_parameter > 0){
+                        $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-system-parameter" data-parameter-id="'. $parameter_id .'" title="Delete System Parameter">
+                        <i class="bx bx-trash font-size-16 align-middle"></i>
+                        </button>';
+                    }
+                    else{
+                        $delete = '';
+                    }
+
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                        $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                <i class="bx bx-detail font-size-16 align-middle"></i>
+                                            </button>';
+                    }
+                    else{
+                        $transaction_log = '';
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $parameter_id .'">',
+                        'PARAMETER_ID' => $parameter_id,
+                        'PARAMETER' => $parameter . '<p class="text-muted mb-0">'. $parameter_description .'</p>',
+                        'ACTION' => '<div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary waves-effect waves-light view-system-parameter" data-parameter-id="'. $parameter_id .'" title="View System Parameter">
+                                <i class="bx bx-show font-size-16 align-middle"></i>
+                            </button>
+                            '. $update .'
+                            '. $transaction_log .'
+                            '. $delete .'
+                        </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System code table
+    else if($type == 'system code table'){
+        if ($api->databaseConnection()) {
+            # Get permission
+            $update_system_code = $api->check_role_permissions($username, 32);
+            $delete_system_code = $api->check_role_permissions($username, 33);
+            $view_transaction_log = $api->check_role_permissions($username, 34);
+
+            $sql = $api->db_connection->prepare('SELECT SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID FROM global_system_code ORDER BY SYSTEM_TYPE');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $system_type = $row['SYSTEM_TYPE'];
+                    $system_code = $row['SYSTEM_CODE'];
+                    $system_description = $row['SYSTEM_DESCRIPTION'];
+                    $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+
+                    if($update_system_code > 0){
+                        $update = '<button type="button" class="btn btn-info waves-effect waves-light update-system-code" data-system-type="'. $system_type .'" data-system-code="'. $system_code .'" title="Edit System Code">
+                                        <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                    </button>';
+                    }
+                    else{
+                        $update = '';
+                    }
+
+                    if($delete_system_code > 0 && ($system_type != 'SYSTYPE' || $system_code != 'SYSTYPE')){
+                        $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-system-code" data-system-type="'. $system_type .'" data-system-code="'. $system_code .'" title="Delete System Code">
+                        <i class="bx bx-trash font-size-16 align-middle"></i>
+                        </button>';
+                    }
+                    else{
+                        $delete = '';
+                    }
+
+                    if($system_type != 'SYSTYPE' || $system_code != 'SYSTYPE'){
+                        $check_box = '<input class="form-check-input datatable-checkbox-children" type="checkbox" data-system-type="'. $system_type .'" data-system-code="'. $system_code .'">';
+                    }
+                    else{
+                        $check_box = '';
+                    }
+
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                        $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                <i class="bx bx-detail font-size-16 align-middle"></i>
+                                            </button>';
+                    }
+                    else{
+                        $transaction_log = '';
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => $check_box,
+                        'SYSTEM_TYPE' => $system_type,
+                        'SYSTEM_CODE' => $system_code . '<p class="text-muted mb-0">'. $system_description .'</p>',
+                        'ACTION' => '<div class="d-flex gap-2">
+                            '. $update .'
+                            '. $transaction_log .'
+                            '. $delete .'
+                        </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Upload setting table
+    else if($type == 'upload setting table'){
+        if ($api->databaseConnection()) {
+            # Get permission
+            $update_upload_setting = $api->check_role_permissions($username, 37);
+            $delete_upload_setting = $api->check_role_permissions($username, 38);
+            $view_transaction_log = $api->check_role_permissions($username, 39);
+
+            $sql = $api->db_connection->prepare('SELECT UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID FROM global_upload_setting ORDER BY UPLOAD_SETTING');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $file_type = '';
+                    $upload_setting_id = $row['UPLOAD_SETTING_ID'];
+                    $upload_setting = $row['UPLOAD_SETTING'];
+                    $description = $row['DESCRIPTION'];
+                    $max_file_size = $row['MAX_FILE_SIZE'];
+                    $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+                    $upload_file_type_details = $api->get_upload_file_type_details($upload_setting_id);
+
+                    for($i = 0; $i < count($upload_file_type_details); $i++) {
+                        $system_code_details = $api->get_system_code_details('FILETYPE', $upload_file_type_details[$i]['FILE_TYPE']);
+                        $file_type .= '<span class="badge bg-info font-size-11">'. $system_code_details[0]['SYSTEM_DESCRIPTION'] .'</span> ';
+
+                        if(($i + 1) % 3 == 0){
+                            $file_type .= '<br/>';
+                        }
+                    }
+
+                    if($delete_upload_setting > 0){
+                        $update = '<button type="button" class="btn btn-info waves-effect waves-light update-upload-setting" data-upload-setting-id="'. $upload_setting_id .'" title="Edit Upload Setting">
+                                        <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                    </button>';
+                    }
+                    else{
+                        $update = '';
+                    }
+
+                    if($delete_upload_setting > 0){
+                        $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-upload-setting" data-upload-setting-id="'. $upload_setting_id .'" title="Delete Upload Setting">
+                                    <i class="bx bx-trash font-size-16 align-middle"></i>
+                                </button>';
+                    }
+                    else{
+                        $delete = '';
+                    }
+
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                        $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                <i class="bx bx-detail font-size-16 align-middle"></i>
+                                            </button>';
+                    }
+                    else{
+                        $transaction_log = '';
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $upload_setting_id .'">',
+                        'UPLOAD_SETTING_ID' => $upload_setting_id,
+                        'UPLOAD_SETTING' => $upload_setting . '<p class="text-muted mb-0">'. $description .'</p>',
+                        'MAX_FILE_SIZE' => $max_file_size . ' Mb',
+                        'FILE_TYPE' => $file_type,
+                        'ACTION' => '<div class="d-flex gap-2">
+                            '. $update .'
+                            '. $transaction_log .'
+                            '. $delete .'
+                        </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Company table
+    else if($type == 'company table'){
+        if ($api->databaseConnection()) {
+            # Get permission
+            $update_company = $api->check_role_permissions($username, 42);
+            $delete_company = $api->check_role_permissions($username, 43);
+            $view_transaction_log = $api->check_role_permissions($username, 44);
+
+            $sql = $api->db_connection->prepare('SELECT COMPANY_ID, COMPANY_NAME, TRANSACTION_LOG_ID FROM global_company');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $company_id = $row['COMPANY_ID'];
+                    $company_name = $row['COMPANY_NAME'];
+                    $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+
+                    if($update_company > 0){
+                        $update = '<button type="button" class="btn btn-info waves-effect waves-light update-company" data-company-id="'. $company_id .'" title="Edit Company">
+                                        <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                    </button>';
+                    }
+                    else{
+                        $update = '';
+                    }
+
+                    if($delete_company > 0){
+                        $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-company" data-company-id="'. $company_id .'" title="Delete Company">
+                            <i class="bx bx-trash font-size-16 align-middle"></i>
+                        </button>';
+                    }
+                    else{
+                        $delete = '';
+                    }
+
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                        $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                <i class="bx bx-detail font-size-16 align-middle"></i>
+                                            </button>';
+                    }
+                    else{
+                        $transaction_log = '';
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $company_id .'">',
+                        'COMPANY_ID' => $company_id,
+                        'COMPANY_NAME' => $company_name,
+                        'ACTION' => '<div class="d-flex gap-2">
+                                            '. $update .'
+                                            '. $permission .'
+                                            '. $transaction_log .'
+                                            '. $delete .'
+                                        </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
             }
         }
     }

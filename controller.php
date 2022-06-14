@@ -68,41 +68,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     #   Submit transactions
     # -------------------------------------------------------------
 
-    # Submit system parameter
-    else if($transaction == 'submit system parameter'){
-        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && isset($_POST['parameter']) && !empty($_POST['parameter']) && isset($_POST['extension']) && isset($_POST['parameter_number'])){
-            $username = $_POST['username'];
-            $parameter_id = $_POST['parameter_id'];
-            $parameter = $_POST['parameter'];
-            $extension = $_POST['extension'];
-            $parameter_number = $api->check_number($_POST['parameter_number']);
-
-            $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
-
-            if($check_system_parameter_exist > 0){
-                $update_system_parameter = $api->update_system_parameter($parameter_id, $parameter, $extension, $parameter_number, $username);
-                                        
-                if($update_system_parameter){
-                    echo 'Updated';
-                }
-                else{
-                    echo $update_system_parameter;
-                }
-            }
-            else{
-                $insert_system_parameter = $api->insert_system_parameter($parameter, $extension, $parameter_number, $username);
-                        
-                if($insert_system_parameter){
-                    echo 'Inserted';
-                }
-                else{
-                    echo $insert_system_parameter;
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
     # Submit policy
     else if($transaction == 'submit policy'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['policy_id']) && isset($_POST['policy']) && !empty($_POST['policy']) && isset($_POST['policy_description']) && !empty($_POST['policy_description'])){
@@ -256,93 +221,6 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
 
     # Submit user account
     else if($transaction == 'submit user account'){
-        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['employee_id']) && isset($_POST['user_code']) && !empty($_POST['user_code']) && isset($_POST['password']) && isset($_POST['role'])){
-            $username = $_POST['username'];
-            $employee_id = $_POST['employee_id'];
-            $user_code = $_POST['user_code'];
-            $password = $_POST['password'];
-            $roles = explode(',', $_POST['role']);
-            $password_expiry_date = $api->format_date('Y-m-d', $system_date, '+6 months');
-
-            if(!empty($password)){
-                $password = $api->encrypt_data($password);
-            }
-
-            $check_user_account_exist = $api->check_user_account_exist($user_code);
-
-            if($check_user_account_exist > 0){
-                $update_user_account = $api->update_user_account($user_code, $password, $password_expiry_date, $username);
-
-                if($update_user_account){
-                    $delete_all_role_users = $api->insert_user_account_role($user_code);
-
-                    if($delete_all_role_users){
-                        foreach($roles as $role){
-                            $insert_user_role = $api->insert_user_role($user_code, $role, $username);
-
-                            if(!$insert_user_role){
-                                $error = $insert_user_role;
-                                break;
-                            }
-                        }
-                    }
-                    else{
-                        $error = $delete_all_role_users;
-                    }                    
-                }
-                else{
-                    $error = $update_user_account;
-                }
-
-                if(empty($error)){
-                    echo 'Updated';
-                }
-                else{
-                    echo $error;
-                }
-            }
-            else{
-                $insert_user_account_role = $api->insert_user_account_role($user_code, $password, $password_expiry_date, $username);
-
-                if($insert_user_account_role){
-                    foreach($roles as $role){
-                        $insert_user_role = $api->insert_user_role($user_code, $role, $username);
-
-                        if(!$insert_user_role){
-                            $error = $insert_user_role;
-                            break;
-                        }
-                    }
-
-                    if(empty($error)){
-                        if(!empty($employee_id)){
-                            $update_employee_user_account = $api->update_employee_user_account($employee_id, $user_code, $username);
-
-                            if($update_employee_user_account){
-                                echo 'Inserted';
-                            }
-                            else{
-                                echo $update_employee_user_account;
-                            }
-                        }
-                        else{
-                            echo 'Inserted';
-                        }
-                    }
-                    else{
-                        echo $error;
-                    }
-                }
-                else{
-                    $error = $insert_user_account_role;
-                }
-            }
-        }
-    }
-    # -------------------------------------------------------------
-
-    # Submit user account update
-    else if($transaction == 'submit user account update'){
         if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['user_code']) && !empty($_POST['user_code']) && isset($_POST['password']) && isset($_POST['role'])){
             $username = $_POST['username'];
             $user_code = $_POST['user_code'];
@@ -360,21 +238,21 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $update_user_account = $api->update_user_account($user_code, $password, $password_expiry_date, $username);
 
                 if($update_user_account){
-                    $delete_all_role_users = $api->insert_user_account_role($user_code);
+                    $delete_all_user_account_role = $api->delete_all_user_account_role($user_code);
 
-                    if($delete_all_role_users){
+                    if($delete_all_user_account_role){
                         foreach($roles as $role){
-                            $insert_user_role = $api->insert_user_role($user_code, $role, $username);
+                            $insert_user_account_role = $api->insert_user_account_role($user_code, $role, $username);
 
-                            if(!$insert_user_role){
-                                $error = $insert_user_role;
+                            if(!$insert_user_account_role){
+                                $error = $insert_user_account_role;
                                 break;
                             }
                         }
                     }
                     else{
-                        $error = $delete_all_role_users;
-                    }
+                        $error = $delete_all_user_account_role;
+                    }                    
                 }
                 else{
                     $error = $update_user_account;
@@ -388,7 +266,155 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 }
             }
             else{
-                echo 'Not Found';
+                $insert_user_account = $api->insert_user_account($user_code, $password, $password_expiry_date, $username);
+
+                if($insert_user_account){
+                    foreach($roles as $role){
+                        $insert_user_account_role = $api->insert_user_account_role($user_code, $role, $username);
+
+                        if(!$insert_user_account_role){
+                            $error = $insert_user_account_role;
+                            break;
+                        }
+                    }
+
+                    if(empty($error)){
+                        echo 'Inserted';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+                else{
+                    $error = $insert_user_account;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit system parameter
+    else if($transaction == 'submit system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && isset($_POST['parameter']) && !empty($_POST['parameter']) && isset($_POST['parameter_description']) && !empty($_POST['parameter_description']) && isset($_POST['extension']) && isset($_POST['parameter_number'])){
+            $username = $_POST['username'];
+            $parameter_id = $_POST['parameter_id'];
+            $parameter = $_POST['parameter'];
+            $parameter_description = $_POST['parameter_description'];
+            $extension = $_POST['extension'];
+            $parameter_number = $api->check_number($_POST['parameter_number']);
+
+            $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+
+            if($check_system_parameter_exist > 0){
+                $update_system_parameter = $api->update_system_parameter($parameter_id, $parameter, $parameter_description, $extension, $parameter_number, $username);
+                                        
+                if($update_system_parameter){
+                    echo 'Updated';
+                }
+                else{
+                    echo $update_system_parameter;
+                }
+            }
+            else{
+                $insert_system_parameter = $api->insert_system_parameter($parameter, $parameter_description, $extension, $parameter_number, $username);
+                        
+                if($insert_system_parameter){
+                    echo 'Inserted';
+                }
+                else{
+                    echo $insert_system_parameter;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit system code
+    else if($transaction == 'submit system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_type']) && !empty($_POST['system_type']) && isset($_POST['system_code']) && !empty($_POST['system_code']) && isset($_POST['system_description']) && !empty($_POST['system_description'])){
+            $username = $_POST['username'];
+            $system_type = $_POST['system_type'];
+            $system_code = $_POST['system_code'];
+            $system_description = $_POST['system_description'];
+
+            $check_system_code_exist = $api->check_system_code_exist($system_type, $system_code);
+            
+            if($check_system_code_exist > 0){
+                $update_system_code = $api->update_system_code($system_type, $system_code, $system_description, $username);
+                                    
+                if($update_system_code){
+                    echo 'Updated';
+                }
+                else{
+                    echo $update_system_code;
+                }
+            }
+            else{
+                $insert_system_code = $api->insert_system_code($system_type, $system_code, $system_description, $username);
+                        
+                if($insert_system_code){
+                    echo 'Inserted';
+                }
+                else{
+                    echo $insert_system_code;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit upload setting
+    else if($transaction == 'submit upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && isset($_POST['upload_setting']) && !empty($_POST['upload_setting']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['max_file_size']) && !empty($_POST['max_file_size']) && isset($_POST['file_type']) && !empty($_POST['file_type'])){
+            $error = '';
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $upload_setting = $_POST['upload_setting'];
+            $description = $_POST['description'];
+            $max_file_size = $api->remove_comma($_POST['max_file_size']);
+            $file_types = explode(',', $_POST['file_type']);
+
+            $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+
+            if($check_upload_setting_exist > 0){
+                $update_upload_setting = $api->update_upload_setting($upload_setting_id, $upload_setting, $description, $max_file_size, $username);
+
+                if($update_upload_setting){
+                    $delete_all_upload_file_type = $api->delete_all_upload_file_type($upload_setting_id, $username);
+
+                    if($delete_all_upload_file_type){
+                        foreach($file_types as $file_type){
+                            $insert_upload_file_type = $api->insert_upload_file_type($upload_setting_id, $file_type, $username);
+
+                            if(!$insert_upload_file_type){
+                                $error = $insert_upload_file_type;
+                            }
+                        }
+                    }
+                    else{
+                        $error = $delete_all_upload_file_type;
+                    }
+
+                    if(empty($error)){
+                        echo 'Updated';
+                    }
+                    else{
+                        echo $error;
+                    }
+                }
+                else{
+                    echo $update_upload_setting;
+                }
+            }
+            else{
+                $insert_upload_setting = $api->insert_upload_setting($upload_setting, $description, $max_file_size, $file_types, $username);
+
+                if($insert_upload_setting){
+                    echo 'Inserted';
+                }
+                else{
+                    echo $insert_upload_setting;
+                }
             }
         }
     }
@@ -594,6 +620,191 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Delete system parameter
+    else if($transaction == 'delete system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
+            $username = $_POST['username'];
+            $parameter_id = $_POST['parameter_id'];
+
+            $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+
+            if($check_system_parameter_exist > 0){
+                $delete_system_parameter = $api->delete_system_parameter($parameter_id, $username);
+                                    
+                if($delete_system_parameter){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_system_parameter;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple system parameter
+    else if($transaction == 'delete multiple system parameter'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['parameter_id'])){
+            $username = $_POST['username'];
+            $parameter_ids = $_POST['parameter_id'];
+
+            foreach($parameter_ids as $parameter_id){
+                $check_system_parameter_exist = $api->check_system_parameter_exist($parameter_id);
+
+                if($check_system_parameter_exist > 0){
+                    $delete_system_parameter = $api->delete_system_parameter($parameter_id, $username);
+                                        
+                    if(!$delete_system_parameter){
+                        $error = $delete_system_parameter;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete system code
+    else if($transaction == 'delete system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_type']) && !empty($_POST['system_type']) && isset($_POST['system_code']) && !empty($_POST['system_code'])){
+            $username = $_POST['username'];
+            $system_type = $_POST['system_type'];
+            $system_code = $_POST['system_code'];
+
+            $check_system_code_exist = $api->check_system_code_exist($system_type, $system_code);
+
+            if($check_system_code_exist > 0){
+                $delete_system_code = $api->delete_system_code($system_type, $system_code, $username);
+                                    
+                if($delete_system_code){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_system_code;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple system code
+    else if($transaction == 'delete multiple system code'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['system_type']) && isset($_POST['system_code'])){
+            $username = $_POST['username'];
+            $system_type = $_POST['system_type'];
+            $system_code = $_POST['system_code'];
+            $system_type_length = count($system_type);
+
+            for($i = 0; $i < $system_type_length; $i++){
+                $check_system_code_exist = $api->check_system_code_exist($system_type[$i], $system_code[$i]);
+
+                if($check_system_code_exist > 0){
+                    $delete_system_code = $api->delete_system_code($system_type[$i], $system_code[$i], $username);
+                                        
+                    if(!$delete_system_code){
+                        $error = $delete_system_code;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete upload setting
+    else if($transaction == 'delete upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            $username = $_POST['username'];
+            $upload_setting_id = $_POST['upload_setting_id'];
+
+            $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+
+            if($check_upload_setting_exist > 0){
+                $delete_upload_setting = $api->delete_upload_setting($upload_setting_id, $username);
+                                    
+                if($delete_upload_setting){
+                    $delete_all_upload_file_type = $api->delete_all_upload_file_type($upload_setting_id, $username);
+                                    
+                    if($delete_all_upload_file_type){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_all_upload_file_type;
+                    }
+                }
+                else{
+                    echo $delete_upload_setting;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple upload setting
+    else if($transaction == 'delete multiple upload setting'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['upload_setting_id'])){
+            $username = $_POST['username'];
+            $upload_setting_ids = $_POST['upload_setting_id'];
+
+            foreach($upload_setting_ids as $upload_setting_id){
+                $check_upload_setting_exist = $api->check_upload_setting_exist($upload_setting_id);
+
+                if($check_upload_setting_exist > 0){
+                    $delete_upload_setting = $api->delete_upload_setting($upload_setting_id, $username);
+                                    
+                    if($delete_upload_setting){
+                        $delete_all_upload_file_type = $api->delete_all_upload_file_type($upload_setting_id, $username);
+                                    
+                        if(!$delete_all_upload_file_type){
+                            $error = $delete_all_upload_file_type;
+                        }                       
+                    }
+                    else{
+                        $error = $delete_upload_setting;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Unlock transactions
     # -------------------------------------------------------------
@@ -727,7 +938,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $check_user_account_exist = $api->check_user_account_exist($user_code);
 
             if($check_user_account_exist > 0){
-                $update_user_account_status = $api->update_user_account_status($user_code, 1, $username);
+                $update_user_account_status = $api->update_user_account_status($user_code, 'ACTIVE', $username);
     
                 if($update_user_account_status){
                     echo 'Activated';
@@ -753,7 +964,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $check_user_account_exist = $api->check_user_account_exist($user_code);
 
                 if($check_user_account_exist > 0){
-                    $update_user_account_status = $api->update_user_account_status($user_code, 1, $username);
+                    $update_user_account_status = $api->update_user_account_status($user_code, "ACTIVE", $username);
                                     
                     if(!$update_user_account_status){
                         $error = $update_user_account_status;
@@ -787,7 +998,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $check_user_account_exist = $api->check_user_account_exist($user_code);
 
             if($check_user_account_exist > 0){
-                $update_user_account_status = $api->update_user_account_status($user_code, 0, $username);
+                $update_user_account_status = $api->update_user_account_status($user_code, 'INACTIVE', $username);
     
                 if($update_user_account_status){
                     echo 'Deactivated';
@@ -813,7 +1024,7 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 $check_user_account_exist = $api->check_user_account_exist($user_code);
 
                 if($check_user_account_exist > 0){
-                    $update_user_account_status = $api->update_user_account_status($user_code, 0, $username);
+                    $update_user_account_status = $api->update_user_account_status($user_code, 'INACTIVE', $username);
                                     
                     if(!$update_user_account_status){
                         $error = $update_user_account_status;
@@ -926,8 +1137,8 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
-    # View user account details
-    else if($transaction == 'view user account details'){
+    # User account summary details
+    else if($transaction == 'user account summary details'){
         if(isset($_POST['user_code']) && !empty($_POST['user_code'])){
             $roles = '';
             $user_code = $_POST['user_code'];
@@ -948,12 +1159,76 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
             $account_status = $api->get_user_account_status($user_account_details[0]['USER_STATUS'])[0]['STATUS'];
 
             $response[] = array(
-                'FILE_AS' => $user_code,
                 'ACTIVE' => $account_status,
                 'PASSWORD_EXPIRY_DATE' => $api->check_date('empty', $user_account_details[0]['PASSWORD_EXPIRY_DATE'], '', 'F d, Y', '', '', ''),
                 'FAILED_LOGIN' => $user_account_details[0]['FAILED_LOGIN'],
                 'LAST_FAILED_LOGIN' => $api->check_date('empty', $user_account_details[0]['LAST_FAILED_LOGIN'], '', 'F d, Y', '', '', ''),
                 'ROLES' => $roles
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System parameter details
+    else if($transaction == 'system parameter details'){
+        if(isset($_POST['parameter_id']) && !empty($_POST['parameter_id'])){
+            $parameter_id = $_POST['parameter_id'];
+            $system_parameter_details = $api->get_system_parameter_details($parameter_id);
+
+            $response[] = array(
+                'PARAMETER' => $system_parameter_details[0]['PARAMETER'],
+                'PARAMETER_DESCRIPTION' => $system_parameter_details[0]['PARAMETER_DESCRIPTION'],
+                'PARAMETER_EXTENSION' => $system_parameter_details[0]['PARAMETER_EXTENSION'],
+                'PARAMETER_NUMBER' => $system_parameter_details[0]['PARAMETER_NUMBER']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # System code details
+    else if($transaction == 'system code details'){
+        if(isset($_POST['system_type']) && !empty($_POST['system_type']) && isset($_POST['system_code']) && !empty($_POST['system_code'])){
+            $response = array();
+
+            $system_type = $_POST['system_type'];
+            $system_code = $_POST['system_code'];
+
+            $system_code_details = $api->get_system_code_details($system_type, $system_code);
+
+            $response[] = array(
+                'SYSTEM_DESCRIPTION' => $system_code_details[0]['SYSTEM_DESCRIPTION']     
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Upload setting details
+    else if($transaction == 'upload setting details'){
+        if(isset($_POST['upload_setting_id']) && !empty($_POST['upload_setting_id'])){
+            $file_type = '';
+            $upload_setting_id = $_POST['upload_setting_id'];
+            $upload_setting_details = $api->get_upload_setting_details($upload_setting_id);
+            $upload_file_type_details = $api->get_upload_file_type_details($upload_setting_id);
+
+            for($i = 0; $i < count($upload_file_type_details); $i++) {
+                $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+
+                if($i != (count($upload_file_type_details) - 1)){
+                    $file_type .= ',';
+                }
+            }
+
+            $response[] = array(
+                'UPLOAD_SETTING' => $upload_setting_details[0]['UPLOAD_SETTING'],
+                'DESCRIPTION' => $upload_setting_details[0]['DESCRIPTION'],
+                'MAX_FILE_SIZE' => $upload_setting_details[0]['MAX_FILE_SIZE'],
+                'FILE_TYPE' => $file_type
             );
 
             echo json_encode($response);

@@ -65,12 +65,57 @@ CREATE TABLE global_role_permission(
 	RECORD_LOG VARCHAR(100)
 );
 
+CREATE TABLE global_system_code(
+	SYSTEM_TYPE VARCHAR(20) NOT NULL,
+	SYSTEM_CODE VARCHAR(20) NOT NULL,
+	SYSTEM_DESCRIPTION VARCHAR(100) NOT NULL,
+	TRANSACTION_LOG_ID VARCHAR(100)
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE global_upload_setting(
+	UPLOAD_SETTING_ID INT(50) PRIMARY KEY,
+	UPLOAD_SETTING VARCHAR(200) NOT NULL,
+	DESCRIPTION VARCHAR(200) NOT NULL,
+	MAX_FILE_SIZE DOUBLE,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE global_upload_file_type(
+	UPLOAD_SETTING_ID INT(50),
+	FILE_TYPE VARCHAR(50) NOT NULL,
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE global_company(
+	COMPANY_ID VARCHAR(50) PRIMARY KEY,
+	COMPANY_NAME VARCHAR(100) NOT NULL,
+	COMPANY_LOGO VARCHAR(500),
+	EMAIL VARCHAR(50),
+	TELEPHONE VARCHAR(20),
+	MOBILE VARCHAR(20),
+	WEBSITE VARCHAR(100),
+	TAX_ID VARCHAR(100),
+	STREET_1 VARCHAR(200),
+	STREET_2 VARCHAR(200),
+	COUNTRY_ID INT,
+	PROVINCE_ID INT,
+	CITY VARCHAR(100),
+	ZIP_CODE VARCHAR(10),
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
 /* Index */
 CREATE INDEX global_user_account_index ON global_user_account(USERNAME);
 CREATE INDEX global_system_parameter_index ON global_system_parameters(PARAMETER_ID);
 CREATE INDEX global_policy_index ON global_policy(POLICY_ID);
 CREATE INDEX global_permission_index ON global_policy(POLICY_ID);
 CREATE INDEX global_role_index ON global_role(ROLE_ID);
+CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
+CREATE INDEX global_upload_setting_index ON global_upload_setting(UPLOAD_SETTING_ID);
+CREATE INDEX global_company_index ON global_company(COMPANY_ID);
 
 /* Stored Procedure */
 
@@ -499,7 +544,7 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
-CREATE PROCEDURE update_user_account_status(IN username VARCHAR(50), IN USER_STATUS INT(1), IN record_log VARCHAR(100))
+CREATE PROCEDURE update_user_account_status(IN username VARCHAR(50), IN USER_STATUS VARCHAR(10), IN record_log VARCHAR(100))
 BEGIN
 	SET @username = username;
 	SET @USER_STATUS = USER_STATUS;
@@ -533,6 +578,250 @@ BEGIN
 	DROP PREPARE stmt;
 END //
 
+CREATE PROCEDURE check_system_parameter_exist(IN parameter_id INT)
+BEGIN
+	SET @parameter_id = parameter_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_system_parameter(IN parameter_id INT, IN parameter VARCHAR(100), IN parameter_description VARCHAR(100), IN extension VARCHAR(10), IN parameter_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @parameter_id = parameter_id;
+	SET @parameter = parameter;
+	SET @parameter_description = parameter_description;
+	SET @extension = extension;
+	SET @parameter_number = parameter_number;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_system_parameters SET PARAMETER = @parameter, PARAMETER_DESCRIPTION = @parameter_description, PARAMETER_EXTENSION = @extension, PARAMETER_NUMBER = @parameter_number, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE PARAMETER_ID = @parameter_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_system_parameter(IN parameter_id INT, IN parameter VARCHAR(100), IN parameter_description VARCHAR(100), IN extension VARCHAR(10), IN parameter_number INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @parameter_id = parameter_id;
+	SET @parameter = parameter;
+	SET @parameter_description = parameter_description;
+	SET @extension = extension;
+	SET @parameter_number = parameter_number;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@parameter_id, @parameter, @parameter_description, @extension, @parameter_number, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_system_parameter_details(IN parameter_id INT)
+BEGIN
+	SET @parameter_id = parameter_id;
+
+	SET @query = 'SELECT PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_system_parameter(IN parameter_id INT)
+BEGIN
+	SET @parameter_id = parameter_id;
+
+	SET @query = 'DELETE FROM global_system_parameters WHERE PARAMETER_ID = @parameter_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_system_code_exist(IN system_type VARCHAR(20), IN system_code VARCHAR(20))
+BEGIN
+	SET @system_type = system_type;
+	SET @system_code = system_code;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_system_code(IN system_type VARCHAR(100), IN system_code VARCHAR(100), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @system_type = system_type;
+	SET @system_code = system_code;
+	SET @system_description = system_description;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_system_code SET SYSTEM_DESCRIPTION = @system_description, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_system_code(IN system_type VARCHAR(100), IN system_code VARCHAR(100), IN system_description VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @system_type = system_type;
+	SET @system_code = system_code;
+	SET @system_description = system_description;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@system_type, @system_code, @system_description, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_system_code_details(IN system_type VARCHAR(100), IN system_code VARCHAR(100))
+BEGIN
+	SET @system_type = system_type;
+	SET @system_code = system_code;
+
+	SET @query = 'SELECT SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID, RECORD_LOG FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_system_code_options(IN system_type VARCHAR(100))
+BEGIN
+	SET @system_type = system_type;
+
+	SET @query = 'SELECT SYSTEM_CODE, SYSTEM_DESCRIPTION FROM global_system_code WHERE SYSTEM_TYPE = @system_type ORDER BY SYSTEM_DESCRIPTION';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_system_code(IN system_type VARCHAR(100), IN system_code VARCHAR(100))
+BEGIN
+	SET @system_type = system_type;
+	SET @system_code = system_code;
+
+	SET @query = 'DELETE FROM global_system_code WHERE SYSTEM_TYPE = @system_type AND SYSTEM_CODE = @system_code';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_upload_setting_exist(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(200), IN description VARCHAR(200), IN max_file_size DOUBLE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @upload_setting = upload_setting;
+	SET @description = description;
+	SET @max_file_size = max_file_size;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_upload_setting SET UPLOAD_SETTING = @upload_setting, DESCRIPTION = @description, MAX_FILE_SIZE = @max_file_size, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_upload_setting(IN upload_setting_id INT(50), IN upload_setting VARCHAR(200), IN description VARCHAR(200), IN max_file_size DOUBLE, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @upload_setting = upload_setting;
+	SET @description = description;
+	SET @max_file_size = max_file_size;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_upload_setting (UPLOAD_SETTING_ID, UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@upload_setting_id, @upload_setting, @description, @max_file_size, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_upload_file_type(IN upload_setting_id INT(50), IN file_type VARCHAR(50), IN record_log VARCHAR(100))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+	SET @file_type = file_type;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_upload_file_type (UPLOAD_SETTING_ID, FILE_TYPE, RECORD_LOG) VALUES(@upload_setting_id, @file_type, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_upload_setting_details(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'SELECT UPLOAD_SETTING, DESCRIPTION, MAX_FILE_SIZE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_upload_file_type_details(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'SELECT FILE_TYPE, RECORD_LOG FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_upload_setting(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'DELETE FROM global_upload_setting WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_upload_file_type(IN upload_setting_id INT(50))
+BEGIN
+	SET @upload_setting_id = upload_setting_id;
+
+	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
 /* Insert Transactions */
 INSERT INTO global_user_account (USERNAME, PASSWORD, USER_STATUS, PASSWORD_EXPIRY_DATE, FAILED_LOGIN, LAST_FAILED_LOGIN, TRANSACTION_LOG_ID) VALUES ('ADMIN', '68aff5412f35ed76', 'Active', '2021-12-30', 0, null, 'TL-1');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('1', 'System Parameter', 'Parameter for system parameters.', '', 3, 'TL-2');
@@ -540,6 +829,7 @@ INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIP
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('3', 'Policy', 'Parameter for policies.', '', 0, 'TL-4');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('4', 'Permissions', 'Parameter for permissions.', '', 0, 'TL-5');
 INSERT INTO global_system_parameters (PARAMETER_ID, PARAMETER, PARAMETER_DESCRIPTION, PARAMETER_EXTENSION, PARAMETER_NUMBER, TRANSACTION_LOG_ID) VALUES ('5', 'Role', 'Parameter for role.', 'RL-', 0, 'TL-5');
+INSERT INTO global_system_code (SYSTEM_TYPE, SYSTEM_CODE, SYSTEM_DESCRIPTION, TRANSACTION_LOG_ID) VALUES ('SYSTYPE', 'SYSTYPE', 'SYSTEM CODE', '');
 
 INSERT INTO global_transaction_log (TRANSACTION_LOG_ID, USERNAME, LOG_TYPE, LOG_DATE, LOG) VALUES ('TL-1', 'ADMIN', 'Insert', '2021-08-01 12:00:00', 'User ADMIN inserted user account.');
 INSERT INTO global_transaction_log (TRANSACTION_LOG_ID, USERNAME, LOG_TYPE, LOG_DATE, LOG) VALUES ('TL-2', 'ADMIN', 'Insert', '2021-08-01 12:00:00', 'User ADMIN inserted system parameter.');

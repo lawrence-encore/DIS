@@ -430,6 +430,340 @@ function initialize_form_validation(form_type){
             }
         });
     }
+    else if(form_type == 'user account form'){
+        $('#user-account-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit user account';
+                var role = $('#role').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&role=' + role,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert User Account Success', 'The user account has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update User Account Success', 'The user account has been updated.', 'success');
+                            }
+                          
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#user-account-datatable');
+                        }
+                        else{
+                            show_alert('User Account Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                user_code: {
+                    required: true
+                },
+                password: {
+                    required: function(element){
+                        var update = $('#update').val();
+
+                        if(update == '0'){
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+                    },
+                    password_strength : true
+                },
+                role: {
+                    required: true
+                }
+            },
+            messages: {
+                user_code: {
+                    required: 'Please enter the username',
+                },
+                password: {
+                    required: 'Please enter the password',
+                },
+                role: {
+                    required: 'Please choose at least one (1) role',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'system parameter form'){
+        $('#system-parameter-form').validate({
+            submitHandler: function (form) {
+                var transaction = 'submit system parameter';
+    
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert System Parameter Success', 'The system parameter has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update System Parameter Success', 'The system parameter has been updated.', 'success');
+                            }
+    
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#system-parameter-datatable');
+                        }
+                        else{
+                            show_alert('System Parameter Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                parameter: {
+                    required: true         
+                },
+                parameter_description: {
+                    required: true         
+                },
+            },
+            messages: {
+                parameter: {
+                    required: 'Please enter the parameter',
+                },
+                parameter_description: {
+                    required: 'Please enter the parameter description',
+                },
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'system code form'){
+        $('#system-code-form').validate({
+            submitHandler: function (form) {
+                var transaction = 'submit system code';
+
+                document.getElementById('system_type').disabled = false;
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert System Code Success', 'The system code has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update System Code Success', 'The system code has been updated.', 'success');
+                            }
+
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#system-code-datatable');
+                        }
+                        else{
+                            show_alert('System Code Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                system_type: {
+                    required: true         
+                },
+                systemcsystem_codeode: {
+                    required: true         
+                },
+                system_description: {
+                    required: true         
+                }
+            },
+            messages: {
+                system_type: {
+                    required: 'Please choose the system type',
+                },
+                system_code: {
+                    required: 'Please enter the system code',
+                },
+                system_description: {
+                    required: 'Please enter the system description',
+                },
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'upload setting form'){
+        $('#upload-setting-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit upload setting';
+                var file_type = $('#file_type').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction + '&file_type=' + file_type,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert Upload Setting Success', 'The upload setting has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update Upload Setting Success', 'The upload setting has been updated.', 'success');
+                            }
+
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#upload-setting-datatable');
+                        }
+                        else{
+                            show_alert('Upload Setting Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                upload_setting: {
+                    required: true
+                },
+                max_file_size: {
+                    required: true
+                },
+                file_type: {
+                    required: true
+                },
+                description: {
+                    required: true
+                }
+            },
+            messages: {
+                upload_setting: {
+                    required: 'Please enter the upload setting',
+                },
+                max_file_size: {
+                    required: 'Please enter the max file size',
+                },
+                file_type: {
+                    required: 'Please choose at least one (1) file type',
+                },
+                description: {
+                    required: 'Please enter the description',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
 }
 
 // Display functions
@@ -437,42 +771,7 @@ function display_form_details(form_type){
     var transaction;
     var d = new Date();
 
-    if(form_type == 'system parameter form'){
-        transaction = 'system parameter details';
-
-        var parameter_id = sessionStorage.getItem('parameter_id');
-
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {parameter_id : parameter_id, transaction : transaction},
-            success: function(response) {
-                $('#parameter').val(response[0].PARAMETER_DESC);
-                $('#extension').val(response[0].PARAMETER_EXTENSION);
-                $('#parameter_number').val(response[0].PARAMETER_NUMBER);
-                $('#parameter_id').val(parameter_id);
-            }
-        });
-    }
-    else if(form_type == 'system parameter details'){
-        transaction = 'system parameter details';
-        
-        var parameter_id = sessionStorage.getItem('parameter_id');
-
-        $.ajax({
-            url: 'controller.php',
-            method: 'POST',
-            dataType: 'JSON',
-            data: {parameter_id : parameter_id, transaction : transaction},
-            success: function(response) {
-                $('#parameter').text(response[0].PARAMETER_DESC);
-                $('#extension').text(response[0].PARAMETER_EXTENSION);
-                $('#parameter_number').text(response[0].PARAMETER_NUMBER);
-            }
-        });
-    }
-    else if(form_type == 'transaction log'){
+    if(form_type == 'transaction log'){
         transaction = 'transaction log details';
         
         var transaction_log_id = sessionStorage.getItem('transaction_log_id');
@@ -561,6 +860,128 @@ function display_form_details(form_type){
                         $(this).prop('checked', true);
                     }
                 });
+            }
+        });
+    }
+    else if(form_type == 'user account form'){
+        transaction = 'user account details';
+
+        var user_code = sessionStorage.getItem('user_code');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {user_code : user_code, transaction : transaction},
+            success: function(response) {
+                $('#user_code').val(user_code);
+                $('#update').val('1');
+
+                check_empty(response[0].ROLES.split(','), '#role', 'select');
+            },
+            complete: function(){
+                document.getElementById('user_code').readOnly = true;
+            }
+        });
+    }
+    else if(form_type == 'user account details'){
+        transaction = 'user account summary details';
+        
+        var user_code = sessionStorage.getItem('user_code');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {user_code : user_code, transaction : transaction},
+            success: function(response) {
+                $('#user_code').text(user_code);
+                $('#active').text(response[0].ACTIVE);
+                $('#password_expiry_date').html(response[0].PASSWORD_EXPIRY_DATE);
+                $('#failed_login').text(response[0].FAILED_LOGIN);
+                $('#last_failed_login').text(response[0].LAST_FAILED_LOGIN);
+                $('#roles').text(response[0].ROLES);
+            }
+        });
+    }
+    else if(form_type == 'system parameter form'){
+        transaction = 'system parameter details';
+
+        var parameter_id = sessionStorage.getItem('parameter_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {parameter_id : parameter_id, transaction : transaction},
+            success: function(response) {
+                $('#parameter_id').val(parameter_id);
+
+                $('#parameter').val(response[0].PARAMETER);
+                $('#parameter_description').val(response[0].PARAMETER_DESCRIPTION);
+                $('#extension').val(response[0].PARAMETER_EXTENSION);
+                $('#parameter_number').val(response[0].PARAMETER_NUMBER);
+            }
+        });
+    }
+    else if(form_type == 'system parameter details'){
+        transaction = 'system parameter details';
+        
+        var parameter_id = sessionStorage.getItem('parameter_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {parameter_id : parameter_id, transaction : transaction},
+            success: function(response) {
+                $('#parameter').text(response[0].PARAMETER);
+                $('#parameter_description').text(response[0].PARAMETER_DESCRIPTION);
+                $('#extension').text(response[0].PARAMETER_EXTENSION);
+                $('#parameter_number').text(response[0].PARAMETER_NUMBER);
+            }
+        });
+    }
+    else if(form_type == 'system code form'){
+        transaction = 'system code details';
+        
+        var system_type = sessionStorage.getItem('system_type');
+        var system_code = sessionStorage.getItem('system_code');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {system_type : system_type, system_code : system_code, transaction : transaction},
+            success: function(response) {
+                $('#system_description').val(response[0].SYSTEM_DESCRIPTION);
+                $('#system_code').val(system_code);
+
+                check_option_exist('#system_type', system_type, '');
+            },
+            complete: function(){
+                document.getElementById('system_type').disabled = true;
+                document.getElementById('system_code').readOnly = true;
+            }
+        });
+    }
+    else if(form_type == 'upload setting form'){
+        transaction = 'upload setting details';
+        
+        var upload_setting_id = sessionStorage.getItem('upload_setting_id');
+  
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {upload_setting_id : upload_setting_id, transaction : transaction},
+            success: function(response) {
+                $('#upload_setting_id').val(upload_setting_id);
+                $('#upload_setting').val(response[0].UPLOAD_SETTING);
+                $('#max_file_size').val(response[0].MAX_FILE_SIZE);
+                $('#description').val(response[0].DESCRIPTION);
+               
+                check_empty(response[0].FILE_TYPE.split(','), '#file_type', 'select');
             }
         });
     }
@@ -775,51 +1196,8 @@ function generate_form(form_type, form_id, add, username){
             else{
                 if(form_type == 'permission form'){
                     var policy_id = $('#policy-id').text();
+
                     $('#policy_id').val(policy_id);
-                }
-                else if(form_type == 'emergency contact form' || form_type == 'employee address form' || form_type == 'employee social form' || form_type == 'employee attendance form' || form_type == 'employee leave entitlement form' || form_type == 'employee leave form' || form_type == 'employee file form' || form_type == 'employee allowance form' || form_type == 'employee allowance update form'){
-                    var employee_id = $('#employee-id').text();
-                    $('#employee_id').val(employee_id);
-                }
-                else if(form_type == 'approve leave form' || form_type == 'reject leave form' || form_type == 'cancel leave form' || form_type == 'approve multiple leave form' || form_type == 'reject multiple leave form' || form_type == 'cancel multiple leave form' || form_type == 'approve employee leave form' || form_type == 'reject employee leave form' || form_type == 'cancel employee leave form'){
-                    var leave_id = sessionStorage.getItem('leave_id');
-                    $('#leave_id').val(leave_id);
-                }
-                else if(form_type == 'time in form' || form_type == 'get location form'){
-                    get_location('');
-                }
-                else if(form_type == 'approve attendance creation form' || form_type == 'approve multiple attendance creation form' || form_type == 'reject attendance creation form' || form_type == 'cancel attendance creation form' || form_type == 'reject multiple attendance creation form' || form_type == 'cancel multiple attendance creation form' || form_type == 'approve attendance adjustment form' || form_type == 'approve multiple attendance adjustment form' || form_type == 'reject attendance adjustment form' || form_type == 'cancel attendance adjustment form' || form_type == 'reject multiple attendance adjustment form' || form_type == 'cancel multiple attendance adjustment form'){
-                    var request_id = sessionStorage.getItem('request_id');
-                    $('#request_id').val(request_id);
-                }
-                else if(form_type == 'contribution bracket form'){
-                    var government_contribution_id = $('#government-contribution-id').text();
-                    $('#government_contribution_id').val(government_contribution_id);
-                }
-                else if(form_type == 'tag loan details as paid form' || form_type == 'tag loan details as unpaid form' || form_type == 'tag multiple loan details as paid form' || form_type == 'tag multiple loan details as unpaid form'){
-                    var loan_details_id = sessionStorage.getItem('loan_details_id');
-                    $('#loan_details_id').val(loan_details_id);
-                }
-                else if(form_type == 'send payslip form'){
-                    var pay_run_id = sessionStorage.getItem('pay_run_id');
-
-                    $('#pay_run_id').val(pay_run_id);
-                    generate_pay_run_payee_option(pay_run_id);
-                }
-                else if(form_type == 'recruitment pipeline stage form'){
-                    var recruitment_pipeline_id = $('#recruitment-pipeline-id').text();
-
-                    $('#recruitment_pipeline_id').val(recruitment_pipeline_id);
-                }
-                else if(form_type == 'recruitment scorecard section form'){
-                    var recruitment_scorecard_id = $('#recruitment-scorecard-id').text();
-
-                    $('#recruitment_scorecard_id').val(recruitment_scorecard_id);
-                }
-                else if(form_type == 'recruitment scorecard section option form'){
-                    var recruitment_scorecard_section_id = $('#recruitment-scorecard-section-id').text();
-
-                    $('#recruitment_scorecard_section_id').val(recruitment_scorecard_section_id);
                 }
             }
 
@@ -858,103 +1236,12 @@ function generate_element(element_type, value, container, modal, username){
             if(modal == '1'){
                 $('#System-Modal').modal('show');
 
-                if(element_type == 'system parameter details' || element_type == 'branch details' || element_type == 'leave details' || element_type == 'employee file details' || element_type == 'employee qr code' || element_type == 'user account details' || element_type == 'employee attendance details' || element_type == 'attendance creation details' || element_type == 'attendance adjustment details' || element_type == 'work shift regular details' || element_type == 'work shift scheduled details' || element_type == 'allowance details' || element_type == 'deduction details' || element_type == 'contribution deduction details' || element_type == 'salary details' || element_type == 'payroll group details' || element_type == 'pay run details' || element_type == 'other income details' || element_type == 'payslip details' || element_type == 'job details'){
+                if(element_type == 'user account details' || element_type == 'system parameter details'){
                     display_form_details(element_type);
-                }
-                else if(element_type == 'scan qr code form'){
-                    $('#qr-code-reader').html('<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span rclass="sr-only"></span></div></div>');
-
-                    Html5Qrcode.getCameras().then(devices => {
-                        if (devices && devices.length) {
-                            var camera_id = devices[0].id;
-            
-                            const html5QrCode = new Html5Qrcode("qr-code-reader");
-                            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                                var audio = new Audio('assets/audio/scan.mp3');
-                                audio.play();
-                                navigator.vibrate([500]);
-            
-                                var employee_id = decodedText.substring(
-                                    decodedText.lastIndexOf("[") + 1, 
-                                    decodedText.lastIndexOf("]")
-                                );
-            
-                                var latitude = sessionStorage.getItem('latitude');
-                                var longitude = sessionStorage.getItem('longitude');
-                                var transaction = 'submit attendance record';
-                                var username = $('#username').text();
-                                    
-                                $.ajax({
-                                    type: 'POST',
-                                    url: 'controller.php',
-                                    data: {username : username, latitude : latitude, employee_id : employee_id, longitude : longitude, transaction : transaction},
-                                    success: function (response) {
-                                        if(response === 'Time In'){
-                                            var audio = new Audio('assets/audio/attendance-clock-in-success.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                        else if(response === 'Time Out'){
-                                            var audio = new Audio('assets/audio/attendance-clock-out-success.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                        else if(response === 'Max Attendance'){
-                                            var audio = new Audio('assets/audio/max-attendance-error.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                        else if(response === 'Location'){
-                                            var audio = new Audio('assets/audio/location-error.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                        else if(response === 'Time Allowance'){
-                                            var audio = new Audio('assets/audio/clock-out-time-error.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                        else{
-                                            var audio = new Audio('assets/audio/attendance-error.mp3');
-                                            audio.play();
-                                            navigator.vibrate([500]);
-                                        }
-                                    }
-                                });
-            
-                                html5QrCode.stop().then((ignore) => {
-                                    $('#qr-code-reader').html('');
-                                    $('#qr-code-reader').html('<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span rclass="sr-only"></span></div></div>');
-                                    
-                                    setTimeout(function(){  html5QrCode.start({ deviceId: { exact: camera_id} }, config, qrCodeSuccessCallback); }, 4000);
-                                }).catch((err) => {
-                                    alert(err);
-                                });
-                            };
-            
-                            html5QrCode.start({ deviceId: { exact: camera_id} }, config, qrCodeSuccessCallback);
-                        }
-                    }).catch(err => {
-                        alert(err);
-                    });
                 }
                 else if(element_type == 'transaction log'){
                     if($('#transaction-log-datatable').length){
                         initialize_transaction_log_table('#transaction-log-datatable');
-                    }
-                }
-                else if(element_type == 'attendance summary details'){
-                    if($('#employee-attendance-datatable').length){
-                        initialize_employee_attendance_table('#employee-attendance-datatable');
-                    }
-
-                    if($('#attendance-adjustment-datatable').length){
-                        initialize_attendance_adjustment_table('#attendance-adjustment-datatable');
-                    }
-
-                    if($('#attendance-creation-datatable').length){
-                        initialize_attendance_creation_table('#attendance-creation-datatable');
                     }
                 }
             }
