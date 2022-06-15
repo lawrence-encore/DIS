@@ -658,6 +658,56 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : check_country_exist
+    # Purpose    : Checks if the country exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_country_exist($country_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_country_exist(:country_id)');
+            $sql->bindValue(':country_id', $country_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : check_state_exist
+    # Purpose    : Checks if the state exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_state_exist($state_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_state_exist(:state_id)');
+            $sql->bindValue(':state_id', $state_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Update methods
     # -------------------------------------------------------------
     
@@ -1314,6 +1364,139 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : update_country
+    # Purpose    : Updates country.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_country($country_id, $country_name, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $country_details = $this->get_country_details($country_id);
+            
+            if(!empty($country_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $country_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_country(:country_id, :country_name, :transaction_log_id, :record_log)');
+            $sql->bindValue(':country_id', $country_id);
+            $sql->bindValue(':country_name', $country_name);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($country_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated country.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated country.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_state
+    # Purpose    : Updates state.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_state($state_id, $state_name, $country_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $state_details = $this->get_state_details($state_id);
+            
+            if(!empty($state_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $state_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_state(:state_id, :state_name, :country_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':state_id', $state_id);
+            $sql->bindValue(':state_name', $state_name);
+            $sql->bindValue(':country_id', $country_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($state_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated state.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated state.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Insert methods
     # -------------------------------------------------------------
     
@@ -1851,6 +2034,129 @@ class Api{
     # -------------------------------------------------------------
 
     # -------------------------------------------------------------
+    #
+    # Name       : insert_country
+    # Purpose    : Insert country.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_country($country_name, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(8, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_country(:id, :country_name, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':country_name', $country_name);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 8, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted country.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : insert_state
+    # Purpose    : Insert state.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function insert_state($state_name, $country_id, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'INS->' . $username . '->' . date('Y-m-d h:i:s');
+
+            # Get system parameter id
+            $system_parameter = $this->get_system_parameter(9, 1);
+            $parameter_number = $system_parameter[0]['PARAMETER_NUMBER'];
+            $id = $system_parameter[0]['ID'];
+
+            # Get transaction log id
+            $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+            $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+            $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+
+            $sql = $this->db_connection->prepare('CALL insert_state(:id, :state_name, :country_id, :transaction_log_id, :record_log)');
+            $sql->bindValue(':id', $id);
+            $sql->bindValue(':state_name', $state_name);
+            $sql->bindValue(':country_id', $country_id);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log); 
+        
+            if($sql->execute()){
+                # Update system parameter value
+                $update_system_parameter_value = $this->update_system_parameter_value($parameter_number, 9, $username);
+
+                if($update_system_parameter_value){
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Insert', 'User ' . $username . ' inserted state.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+                else{
+                    return $update_system_parameter_value;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
     #   Delete methods
     # -------------------------------------------------------------
 
@@ -1887,8 +2193,6 @@ class Api{
     # -------------------------------------------------------------
     public function delete_all_permission($policy_id, $username){
         if ($this->databaseConnection()) {
-            $policy_details = $this->get_policy_details($policy_id);
-
             $sql = $this->db_connection->prepare('CALL delete_all_permission(:policy_id)');
             $sql->bindValue(':policy_id', $policy_id);
         
@@ -2076,6 +2380,75 @@ class Api{
         if ($this->databaseConnection()) {
             $sql = $this->db_connection->prepare('CALL delete_all_upload_file_type(:upload_setting_id)');
             $sql->bindValue(':upload_setting_id', $upload_setting_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_country
+    # Purpose    : Delete country.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_country($country_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_country(:country_id)');
+            $sql->bindValue(':country_id', $country_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_all_state
+    # Purpose    : Delete all state linked to country.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_all_state($country_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_all_state(:country_id)');
+            $sql->bindValue(':country_id', $country_id);
+        
+            if($sql->execute()){
+                return true;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : delete_state
+    # Purpose    : Delete state.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function delete_state($state_id, $username){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL delete_state(:state_id)');
+            $sql->bindValue(':state_id', $state_id);
         
             if($sql->execute()){
                 return true;
@@ -2420,6 +2793,73 @@ class Api{
                 while($row = $sql->fetch()){
                     $response[] = array(
                         'FILE_TYPE' => $row['FILE_TYPE'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_country_details
+    # Purpose    : Gets the country details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_country_details($country_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_country_details(:country_id)');
+            $sql->bindValue(':country_id', $country_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'COUNTRY_NAME' => $row['COUNTRY_NAME'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
+                        'RECORD_LOG' => $row['RECORD_LOG']
+                    );
+                }
+
+                return $response;
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : get_state_details
+    # Purpose    : Gets the state details.
+    #
+    # Returns    : Array
+    #
+    # -------------------------------------------------------------
+    public function get_state_details($state_id){
+        if ($this->databaseConnection()) {
+            $response = array();
+
+            $sql = $this->db_connection->prepare('CALL get_state_details(:state_id)');
+            $sql->bindValue(':state_id', $state_id);
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $response[] = array(
+                        'STATE_NAME' => $row['STATE_NAME'],
+                        'COUNTRY_ID' => $row['COUNTRY_ID'],
+                        'TRANSACTION_LOG_ID' => $row['TRANSACTION_LOG_ID'],
                         'RECORD_LOG' => $row['RECORD_LOG']
                     );
                 }
@@ -3046,6 +3486,85 @@ class Api{
     }
     # -------------------------------------------------------------
 
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_role_permission_form
+    # Purpose    : Generates permission check box.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_state_options(){
+        if ($this->databaseConnection()) {      
+            $option = '';
+
+            $sql = $this->db_connection->prepare('SELECT COUNTRY_ID, COUNTRY_NAME FROM global_country ORDER BY COUNTRY_NAME');
+        
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $country_id = $row['COUNTRY_ID'];
+                    $country_name = $row['COUNTRY_NAME'];
+
+                    $option .= '<optgroup label="'. $country_name .'">';
+
+                                    $sql2 = $this->db_connection->prepare('SELECT STATE_ID, STATE_NAME FROM global_state WHERE COUNTRY_ID = :country_id ORDER BY STATE_NAME');
+                                    $sql2->bindValue(':country_id', $country_id);
+                
+                                    if($sql2->execute()){
+                                        while($res = $sql2->fetch()){
+                                            $state_id = $res['STATE_ID'];
+                                            $state_name = $res['STATE_NAME'];
+
+                                            $option .= '<option value="'. $state_id .'">'. $state_name .'</option>';
+                                        }
+                                    }
+
+                    $option .= '</optgroup>';
+                }
+
+                return $option;
+            }
+            else{
+                return $sql->errorInfo();
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : generate_country_options
+    # Purpose    : Generates country options of dropdown.
+    #
+    # Returns    : String
+    #
+    # -------------------------------------------------------------
+    public function generate_country_options(){
+        if ($this->databaseConnection()) {
+            $option = '';
+            
+            $sql = $this->db_connection->prepare('CALL generate_country_options()');
+
+            if($sql->execute()){
+                $count = $sql->rowCount();
+        
+                if($count > 0){
+                    while($row = $sql->fetch()){
+                        $country_id = $row['COUNTRY_ID'];
+                        $country_name = $row['COUNTRY_NAME'];
+    
+                        $option .= "<option value='". $country_id ."'>". $country_name ."</option>";
+                    }
+    
+                    return $option;
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
 
 }
 

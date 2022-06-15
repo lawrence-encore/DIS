@@ -88,8 +88,12 @@ function initialize_elements(){
     }
 
     if ($('.form-select2').length) {
-        $('.form-select2').select2().on('change', function() {
-            $(this).valid();
+        $('.form-select2').select2({
+            dropdownParent: $('#System-Modal')
+        });
+
+        $('.form-select2').on('select2:close', function (e) {  
+            $(this).valid(); 
         });
     }
 
@@ -764,6 +768,229 @@ function initialize_form_validation(form_type){
             }
         });
     }
+    else if(form_type == 'company form'){
+        $('#company-form').validate({
+            submitHandler: function (form) {
+                var transaction = 'submit company';
+                var username = $('#username').text();
+                
+                var formData = new FormData(form);
+                formData.append('username', username);
+                formData.append('transaction', transaction);
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert Company Success', 'The company has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update Company Success', 'The company has been updated.', 'success');
+                            }
+
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#company-datatable');
+                        }
+                        else if(response === 'File Size'){
+                            show_alert('Company Error', 'The file uploaded exceeds the maximum file size.', 'error');
+                        }
+                        else if(response === 'File Type'){
+                            show_alert('Company Error', 'The file uploaded is not supported.', 'error');
+                        }
+                        else{
+                            show_alert('Company Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                company_name: {
+                    required: true
+                },
+            },
+            messages: {
+                company_name: {
+                    required: 'Please enter the company',
+                },
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'country form'){
+        $('#country-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit country';
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert Country Success', 'The country has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update Country Success', 'The country has been updated.', 'success');
+                            }
+
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#country-datatable');
+                        }
+                        else{
+                            show_alert('Country Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                country_name: {
+                    required: true         
+                }
+            },
+            messages: {
+                country_name: {
+                    required: 'Please enter the country',
+                }
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
+    else if(form_type == 'state form'){
+        $('#state-form').validate({
+            submitHandler: function (form) {
+                transaction = 'submit state';
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'controller.php',
+                    data: $(form).serialize() + '&username=' + username + '&transaction=' + transaction,
+                    beforeSend: function(){
+                        document.getElementById('submit-form').disabled = true;
+                        $('#submit-form').html('<div class="spinner-border spinner-border-sm text-light" role="status"><span rclass="sr-only"></span></div>');
+                    },
+                    success: function (response) {
+                        if(response === 'Updated' || response === 'Inserted'){
+                            if(response === 'Inserted'){
+                                show_alert('Insert State Success', 'The state has been inserted.', 'success');
+                            }
+                            else{
+                                show_alert('Update State Success', 'The state has been updated.', 'success');
+                            }
+
+                            $('#System-Modal').modal('hide');
+                            reload_datatable('#state-datatable');
+                        }
+                        else{
+                            show_alert('State Error', response, 'error');
+                        }
+                    },
+                    complete: function(){
+                        document.getElementById('submit-form').disabled = false;
+                        $('#submit-form').html('Submit');
+                    }
+                });
+                return false;
+            },
+            rules: {
+                state_name: {
+                    required: true
+                },
+                country: {
+                    required: true
+                },
+            },
+            messages: {
+                state_name: {
+                    required: 'Please enter the state',
+                },
+                country: {
+                    required: 'Please choose the country',
+                },
+            },
+            errorPlacement: function(label, element) {
+                if((element.hasClass('select2') || element.hasClass('form-select2')) && element.next('.select2-container').length) {
+                    label.insertAfter(element.next('.select2-container'));
+                }
+                else if(element.parent('.input-group').length){
+                    label.insertAfter(element.parent());
+                }
+                else{
+                    label.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).parent().addClass('has-danger');
+                $(element).addClass('form-control-danger');
+            },
+            success: function(label,element) {
+                $(element).parent().removeClass('has-danger')
+                $(element).removeClass('form-control-danger')
+                label.remove();
+            }
+        });
+    }
 }
 
 // Display functions
@@ -982,6 +1209,40 @@ function display_form_details(form_type){
                 $('#description').val(response[0].DESCRIPTION);
                
                 check_empty(response[0].FILE_TYPE.split(','), '#file_type', 'select');
+            }
+        });
+    }
+    else if(form_type == 'country form'){
+        transaction = 'country details';
+
+        var country_id = sessionStorage.getItem('country_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {country_id : country_id, transaction : transaction},
+            success: function(response) {
+                $('#country_name').val(response[0].COUNTRY_NAME);
+                $('#country_id').val(country_id);
+            }
+        });
+    }
+    else if(form_type == 'state form'){
+        transaction = 'state details';
+
+        var state_id = sessionStorage.getItem('state_id');
+
+        $.ajax({
+            url: 'controller.php',
+            method: 'POST',
+            dataType: 'JSON',
+            data: {state_id : state_id, transaction : transaction},
+            success: function(response) {
+                $('#state_name').val(response[0].STATE_NAME);
+                $('#state_id').val(state_id);
+
+                check_option_exist('#country', response[0].COUNTRY_ID, '');
             }
         });
     }

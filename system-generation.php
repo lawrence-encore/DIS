@@ -259,64 +259,106 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                             </div>';
             }
             else if($form_type == 'company form'){
-                $form .= '<div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <input type="hidden" id="company_id" name="company_id">
-                                    <label for="company_name" class="form-label">Company Name <span class="text-danger">*</span></label>
+                $form .= '<div class="row mb-3">
+                                <input type="hidden" id="company_id" name="company_id">
+                                <label for="company_name" class="col-sm-3 col-form-label">Company Name <span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="company_name" name="company_name" maxlength="100">
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="mb-3">
-                                    <label for="tax_id" class="form-label">Tax ID</label>
-                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="tax_id" name="tax_id" maxlength="100">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="company_logo" class="form-label">Company Logo</label><br/>
+                            <div class="row mb-3">
+                                <label for="company_logo" class="col-sm-3 col-form-label">Company Logo</label>
+                                <div class="col-sm-9">
                                     <input class="form-control" type="file" name="company_logo" id="company_logo">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="street_1" class="form-label">Street 1</label>
-                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_1" name="street_1" maxlength="200">
+                            <div class="row mb-3">
+                                <label for="street_1" class="col-sm-3 col-form-label">Address</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_1" name="street_1" placeholder="Street" maxlength="200">
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="street_2" class="form-label">Street 2</label>
-                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_2" name="street_2" maxlength="200">
+                            <div class="row mb-3">
+                                <label for="street_2" class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_2" name="street_2" placeholder="Street 2" maxlength="200">
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
+                            <div class="row mb-3">
+                                <label for="city" class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="city" name="city" placeholder="City" maxlength="100">
+                                </div>
+                                <div class="col-sm-3">
+                                    <select class="form-control form-select2" id="state" name="state">
+                                    <option value="">State</option>';
+                                    $form .= $api->generate_state_options();
+                                    $form .='</select>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="zip_code" name="zip_code" placeholder="Zip Code" maxlength="10">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="tax_id" class="col-sm-3 col-form-label">Tax ID</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="tax_id" name="tax_id" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                <div class="col-sm-9">
                                     <input id="email" name="email" class="form-control form-maxlength" maxlength="100" autocomplete="off">
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="mobile" class="form-label">Mobile Number</label>
+                            <div class="row mb-3">
+                                <label for="email" class="col-sm-3 col-form-label">Mobile Number</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="mobile" name="mobile" maxlength="30">
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="telephone" class="form-label">Telephone</label>
+                            <div class="row mb-3">
+                                <label for="telephone" class="col-sm-3 col-form-label">Telephone</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="telephone" name="telephone" maxlength="30">
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="telephone" class="form-label">Website</label>
+                            <div class="row mb-3">
+                                <label for="website" class="col-sm-3 col-form-label">Website</label>
+                                <div class="col-sm-9">
                                     <input type="url" class="form-control form-maxlength" autocomplete="off" id="website" name="website" maxlength="100">
+                                </div>
+                            </div>';
+            }
+            else if($form_type == 'country form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="country_id" name="country_id">
+                                    <label for="country_name" class="form-label">Country <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="country_name" name="country_name" maxlength="200">
+                                </div>
+                            </div>
+                        </div>';
+            }
+            else if($form_type == 'state form'){
+                $form .= '<div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <input type="hidden" id="state_id" name="state_id">
+                                    <label for="state_name" class="form-label">State <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-maxlength" autocomplete="off" id="state_name" name="state_name" maxlength="200">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                                    <select class="form-control form-select2" id="country" name="country">
+                                    <option value="">--</option>';
+                                    $form .= $api->generate_country_options();
+                                    $form .='</select>
                                 </div>
                             </div>
                         </div>';
@@ -1116,7 +1158,6 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                         'COMPANY_NAME' => $company_name,
                         'ACTION' => '<div class="d-flex gap-2">
                                             '. $update .'
-                                            '. $permission .'
                                             '. $transaction_log .'
                                             '. $delete .'
                                         </div>'
@@ -1127,6 +1168,152 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
             }
             else{
                 echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Country table
+    else if($type == 'country table'){
+        if ($api->databaseConnection()) {
+            # Get permission
+            $update_country = $api->check_role_permissions($username, 47);
+            $delete_country = $api->check_role_permissions($username, 48);
+            $view_transaction_log = $api->check_role_permissions($username, 49);
+
+            $sql = $api->db_connection->prepare('SELECT COUNTRY_ID, COUNTRY_NAME, TRANSACTION_LOG_ID FROM global_country');
+
+            if($sql->execute()){
+                while($row = $sql->fetch()){
+                    $country_id = $row['COUNTRY_ID'];
+                    $country_name = $row['COUNTRY_NAME'];
+                    $transaction_log_id = $row['TRANSACTION_LOG_ID'];
+
+                    if($update_country > 0){
+                        $update = '<button type="button" class="btn btn-info waves-effect waves-light update-country" data-country-id="'. $country_id .'" title="Edit Country">
+                                        <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                    </button>';
+                    }
+                    else{
+                        $update = '';
+                    }
+
+                    if($delete_country > 0){
+                        $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-country" data-country-id="'. $country_id .'" title="Delete Country">
+                            <i class="bx bx-trash font-size-16 align-middle"></i>
+                        </button>';
+                    }
+                    else{
+                        $delete = '';
+                    }
+
+                    if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                        $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                <i class="bx bx-detail font-size-16 align-middle"></i>
+                                            </button>';
+                    }
+                    else{
+                        $transaction_log = '';
+                    }
+
+                    $response[] = array(
+                        'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $country_id .'">',
+                        'COUNTRY_ID' => $country_id,
+                        'COUNTRY_NAME' => $country_name,
+                        'ACTION' => '<div class="d-flex gap-2">
+                                            '. $update .'
+                                            '. $transaction_log .'
+                                            '. $delete .'
+                                        </div>'
+                    );
+                }
+
+                echo json_encode($response);
+            }
+            else{
+                echo $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # State table
+    else if($type == 'state table'){
+        if(isset($_POST['filter_country'])){
+            if ($api->databaseConnection()) {
+                # Get permission
+                $update_state = $api->check_role_permissions($username, 52);
+                $delete_state = $api->check_role_permissions($username, 53);
+                $view_transaction_log = $api->check_role_permissions($username, 54);
+
+                $filter_country = $_POST['filter_country'];
+
+                $query = 'SELECT STATE_ID, STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID FROM global_state';
+
+                if(!empty($filter_country)){
+                    $query .= ' WHERE COUNTRY_ID = :filter_country';
+                }
+    
+                $sql = $api->db_connection->prepare($query);
+
+                if(!empty($filter_country)){
+                    $sql->bindValue(':filter_country', $filter_country);
+                }
+    
+                if($sql->execute()){
+                    while($row = $sql->fetch()){
+                        $state_id = $row['STATE_ID'];
+                        $state_name = $row['STATE_NAME'];
+                        $country_id = $row['COUNTRY_ID'];
+
+                        $country_details = $api->get_country_details($country_id);
+                        $country_name = $country_details[0]['COUNTRY_NAME'];
+    
+                        if($update_state > 0){
+                            $update = '<button type="button" class="btn btn-info waves-effect waves-light update-state" data-state-id="'. $state_id .'" title="Edit State">
+                                            <i class="bx bx-pencil font-size-16 align-middle"></i>
+                                        </button>';
+                        }
+                        else{
+                            $update = '';
+                        }
+    
+                        if($delete_state > 0){
+                            $delete = '<button type="button" class="btn btn-danger waves-effect waves-light delete-state" data-state-id="'. $state_id .'" title="Delete State">
+                                <i class="bx bx-trash font-size-16 align-middle"></i>
+                            </button>';
+                        }
+                        else{
+                            $delete = '';
+                        }
+    
+                        if($view_transaction_log > 0 && !empty($transaction_log_id)){
+                            $transaction_log = '<button type="button" class="btn btn-dark waves-effect waves-light view-transaction-log" data-transaction-log-id="'. $transaction_log_id .'" title="View Transaction Log">
+                                                    <i class="bx bx-detail font-size-16 align-middle"></i>
+                                                </button>';
+                        }
+                        else{
+                            $transaction_log = '';
+                        }
+    
+                        $response[] = array(
+                            'CHECK_BOX' => '<input class="form-check-input datatable-checkbox-children" type="checkbox" value="'. $state_id .'">',
+                            'STATE_ID' => $state_id,
+                            'STATE_NAME' => $state_name,
+                            'COUNTRY' => $country_name,
+                            'ACTION' => '<div class="d-flex gap-2">
+                                                '. $update .'
+                                                '. $transaction_log .'
+                                                '. $delete .'
+                                            </div>'
+                        );
+                    }
+    
+                    echo json_encode($response);
+                }
+                else{
+                    echo $sql->errorInfo()[2];
+                }
             }
         }
     }

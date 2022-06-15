@@ -420,6 +420,202 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
     }
     # -------------------------------------------------------------
 
+    # Submit company management
+    else if($transaction == 'submit company management'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id']) && isset($_POST['company_name']) && !empty($_POST['company_name']) && isset($_POST['street_1']) && isset($_POST['street_2']) && isset($_POST['city']) && isset($_POST['state']) && isset($_POST['zip_code']) && isset($_POST['tax_id']) && isset($_POST['email']) && isset($_POST['mobile']) && isset($_POST['telephone']) && isset($_POST['website'])){
+            $file_type = '';
+            $username = $_POST['username'];
+            $company_id = $_POST['company_id'];
+            $company_name = $_POST['company_name'];
+            $street_1 = $_POST['street_1'];
+            $street_2 = $_POST['street_2'];
+            $city = $_POST['city'];
+            $state = $_POST['state'];
+            $zip_code = $_POST['zip_code'];
+            $tax_id = $_POST['tax_id'];
+            $email = $_POST['email'];
+            $mobile = $_POST['mobile'];
+            $telephone = $_POST['telephone'];
+            $website = $_POST['website'];
+
+            $state_details = $api->get_state_details($state);
+            $country_id = $state_details[0]['COUNTRY_ID'] ?? null;
+
+            $company_logo_name = $_FILES['company_logo']['name'];
+            $company_logo_size = $_FILES['company_logo']['size'];
+            $company_logo_error = $_FILES['company_logo']['error'];
+            $company_logo_tmp_name = $_FILES['company_logo']['tmp_name'];
+            $company_logo_ext = explode('.', $company_logo_name);
+            $company_logo_actual_ext = strtolower(end($company_logo_ext));
+
+            $upload_setting_details = $api->get_upload_setting_details(1);
+            $upload_file_type_details = $api->get_upload_file_type_details(1);
+            $file_max_size = $upload_setting_details[0]['MAX_FILE_SIZE'] * 1048576;
+
+            for($i = 0; $i < count($upload_file_type_details); $i++) {
+                $file_type .= $upload_file_type_details[$i]['FILE_TYPE'];
+
+                if($i != (count($upload_file_type_details) - 1)){
+                    $file_type .= ',';
+                }
+            }
+
+            $allowed_ext = explode(',', $file_type);
+
+            $check_company_exist = $api->check_company_exist($company_id);
+ 
+            if($check_company_exist > 0){
+                if(!empty($company_logo_tmp_name)){
+                    if(in_array($company_logo_actual_ext, $allowed_ext)){
+                        if(!$company_logo_error){
+                            if($company_logo_size < $file_max_size){
+                                $update_company_logo = $api->update_company_logo($company_logo_tmp_name, $company_logo_actual_ext, $company_id, $username);
+        
+                                if($update_company_logo){
+                                    $update_company_details = $api->update_company_details($company_id, $company_name, $email, $telephone, $mobile, $website, $tax_id, $street_1, $street_2, $country_id, $state, $city, $zip_code, $username);
+
+                                    if($update_company_details){
+                                        echo 'Updated';
+                                    }
+                                    else{
+                                        echo $update_company_details;
+                                    }
+                                }
+                                else{
+                                    echo $update_company_logo;
+                                }
+                            }
+                            else{
+                                echo 'File Size';
+                            }
+                        }
+                        else{
+                            echo 'There was an error uploading the file.';
+                        }
+                    }
+                    else{
+                        echo 'File Type';
+                    }
+                }
+                else{
+                    $update_company_details = $api->update_company_details($company_id, $company_name, $email, $telephone, $mobile, $website, $tax_id, $street_1, $street_2, $country_id, $state, $city, $zip_code, $username);
+
+                    if($update_company_details){
+                        echo 'Updated';
+                    }
+                    else{
+                        echo $update_company_details;
+                    }
+                }
+            }
+            else{
+                if(!empty($company_logo_tmp_name)){
+                    if(in_array($company_logo_actual_ext, $allowed_ext)){
+                        if(!$company_logo_error){
+                            if($company_logo_size < $file_max_size){
+                                $insert_company = $api->insert_company($company_logo_tmp_name, $company_logo_actual_ext, $company_name, $email, $telephone, $mobile, $website, $tax_id, $street_1, $street_2, $country_id, $state, $city, $zip_code, $username);
+    
+                                if($insert_company){
+                                    echo 'Inserted';
+                                }
+                                else{
+                                    echo $insert_company;
+                                }
+                            }
+                            else{
+                                echo 'File Size';
+                            }
+                        }
+                        else{
+                            echo 'There was an error uploading the file.';
+                        }
+                    }
+                    else{
+                        echo 'File Type';
+                    }
+                }
+                else{
+                    $insert_company = $api->insert_company(null, null, $company_name, $email, $telephone, $mobile, $website, $tax_id, $street_1, $street_2, $country_id, $state, $city, $zip_code, $username);
+    
+                    if($insert_company){
+                        echo 'Inserted';
+                    }
+                    else{
+                        echo $insert_company;
+                    }
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit country
+    else if($transaction == 'submit country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id']) && isset($_POST['country_name']) && !empty($_POST['country_name'])){
+            $username = $_POST['username'];
+            $country_id = $_POST['country_id'];
+            $country_name = $_POST['country_name'];
+
+            $check_country_exist = $api->check_country_exist($country_id);
+
+            if($check_country_exist > 0){
+                $update_country = $api->update_country($country_id, $country_name, $username);
+
+                if($update_country){
+                    echo 'Updated';
+                }
+                else{
+                    echo $update_country;
+                }
+            }
+            else{
+                $insert_country = $api->insert_country($country_name, $username);
+
+                if($insert_country){
+                    echo 'Inserted';
+                }
+                else{
+                    echo $insert_country;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Submit state
+    else if($transaction == 'submit state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id']) && isset($_POST['state_name']) && !empty($_POST['state_name']) && isset($_POST['country']) && !empty($_POST['country'])){
+            $username = $_POST['username'];
+            $state_id = $_POST['state_id'];
+            $state_name = $_POST['state_name'];
+            $country = $_POST['country'];
+
+            $check_state_exist = $api->check_state_exist($state_id);
+
+            if($check_state_exist > 0){
+                $update_state = $api->update_state($state_id, $state_name, $country, $username);
+
+                if($update_state){
+                    echo 'Updated';
+                }
+                else{
+                    echo $update_state;
+                }
+            }
+            else{
+                $insert_state = $api->insert_state($state_name, $country, $username);
+
+                if($insert_state){
+                    echo 'Inserted';
+                }
+                else{
+                    echo $insert_state;
+                }
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
     # -------------------------------------------------------------
     #   Delete transactions
     # -------------------------------------------------------------
@@ -788,6 +984,188 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                     }
                     else{
                         $error = $delete_upload_setting;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete country
+    else if($transaction == 'delete country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $username = $_POST['username'];
+            $country_id = $_POST['country_id'];
+
+            $check_country_exist = $api->check_country_exist($country_id);
+
+            if($check_country_exist > 0){
+                $delete_all_state = $api->delete_all_state($country_id, $username);
+                                    
+                if($delete_all_state){
+                    $delete_country = $api->delete_country($country_id, $username);
+                                    
+                    if($delete_country){
+                        echo 'Deleted';
+                    }
+                    else{
+                        echo $delete_country;
+                    }
+                }
+                else{
+                    echo $delete_all_state;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple country
+    else if($transaction == 'delete multiple country'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['country_id'])){
+            $username = $_POST['username'];
+            $country_ids = $_POST['country_id'];
+
+            foreach($country_ids as $country_id){
+                $check_country_exist = $api->check_country_exist($country_id);
+
+                if($check_country_exist > 0){
+                    $delete_country = $api->delete_country($country_id, $username);
+                                    
+                    if($delete_country){
+                        $delete_all_state = $api->delete_all_state($country_id, $username);
+                                        
+                        if(!$delete_all_state){
+                            $error = $delete_all_state;
+                        }
+                    }
+                    else{
+                        $error = $delete_country;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete state
+    else if($transaction == 'delete state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id']) && !empty($_POST['state_id'])){
+            $username = $_POST['username'];
+            $state_id = $_POST['state_id'];
+
+            $check_state_exist = $api->check_state_exist($state_id);
+
+            if($check_state_exist > 0){
+                $delete_state = $api->delete_state($state_id, $username);
+                                    
+                if($delete_state){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_state;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple state
+    else if($transaction == 'delete multiple state'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['state_id'])){
+            $username = $_POST['username'];
+            $state_ids = $_POST['state_id'];
+
+            foreach($state_ids as $state_id){
+                $check_state_exist = $api->check_state_exist($state_id);
+
+                if($check_state_exist > 0){
+                    $delete_state = $api->delete_state($state_id, $username);
+                                    
+                    if(!$delete_state){
+                        $error = $delete_state;
+                    }
+                }
+                else{
+                    $error = 'Not Found';
+                }
+            }
+
+            if(empty($error)){
+                echo 'Deleted';
+            }
+            else{
+                echo $error;
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete company
+    else if($transaction == 'delete company'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id']) && !empty($_POST['company_id'])){
+            $username = $_POST['username'];
+            $company_id = $_POST['company_id'];
+
+            $check_company_exist = $api->check_company_exist($company_id);
+
+            if($check_company_exist > 0){
+                $delete_company = $api->delete_company($company_id, $username);
+                                    
+                if($delete_company){
+                    echo 'Deleted';
+                }
+                else{
+                    echo $delete_company;
+                }
+            }
+            else{
+                echo 'Not Found';
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Delete multiple company
+    else if($transaction == 'delete multiple company'){
+        if(isset($_POST['username']) && !empty($_POST['username']) && isset($_POST['company_id'])){
+            $username = $_POST['username'];
+            $company_ids = $_POST['company_id'];
+
+            foreach($company_ids as $company_id){
+                $check_company_exist = $api->check_company_exist($company_id);
+
+                if($check_company_exist > 0){
+                    $delete_company = $api->delete_company($company_id, $username);
+                                    
+                    if(!$delete_company){
+                        $error = $delete_company;
                     }
                 }
                 else{
@@ -1229,6 +1607,62 @@ if(isset($_POST['transaction']) && !empty($_POST['transaction'])){
                 'DESCRIPTION' => $upload_setting_details[0]['DESCRIPTION'],
                 'MAX_FILE_SIZE' => $upload_setting_details[0]['MAX_FILE_SIZE'],
                 'FILE_TYPE' => $file_type
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Company details
+    else if($transaction == 'company details'){
+        if(isset($_POST['company_id']) && !empty($_POST['company_id'])){
+            $company_id = $_POST['company_id'];
+            $company_details = $api->get_company_details($company_id);
+
+            $response[] = array(
+                'COMPANY_NAME' => $company_details[0]['COMPANY_NAME'],
+                'EMAIL' => $company_details[0]['EMAIL'],
+                'TELEPHONE' => $company_details[0]['TELEPHONE'],
+                'MOBILE' => $company_details[0]['MOBILE'],
+                'WEBSITE' => $company_details[0]['WEBSITE'],
+                'TAX_ID' => $company_details[0]['TAX_ID'],
+                'STREET_1' => $company_details[0]['STREET_1'],
+                'STREET_2' => $company_details[0]['STREET_2'],
+                'STATE_ID' => $company_details[0]['STATE_ID'],
+                'CITY' => $company_details[0]['CITY'],
+                'ZIP_CODE' => $company_details[0]['ZIP_CODE']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # Country details
+    else if($transaction == 'country details'){
+        if(isset($_POST['country_id']) && !empty($_POST['country_id'])){
+            $country_id = $_POST['country_id'];
+            $country_details = $api->get_country_details($country_id);
+
+            $response[] = array(
+                'COUNTRY_NAME' => $country_details[0]['COUNTRY_NAME']
+            );
+
+            echo json_encode($response);
+        }
+    }
+    # -------------------------------------------------------------
+
+    # State details
+    else if($transaction == 'state details'){
+        if(isset($_POST['state_id']) && !empty($_POST['state_id'])){
+            $state_id = $_POST['state_id'];
+            $state_details = $api->get_state_details($state_id);
+
+            $response[] = array(
+                'STATE_NAME' => $state_details[0]['STATE_NAME'],
+                'COUNTRY_ID' => $state_details[0]['COUNTRY_ID']
             );
 
             echo json_encode($response);

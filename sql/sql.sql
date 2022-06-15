@@ -100,9 +100,24 @@ CREATE TABLE global_company(
 	STREET_1 VARCHAR(200),
 	STREET_2 VARCHAR(200),
 	COUNTRY_ID INT,
-	PROVINCE_ID INT,
+	STATE_ID INT,
 	CITY VARCHAR(100),
 	ZIP_CODE VARCHAR(10),
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE global_country(
+	COUNTRY_ID INT PRIMARY KEY,
+	COUNTRY_NAME VARCHAR(200) NOT NULL,
+    TRANSACTION_LOG_ID VARCHAR(100),
+	RECORD_LOG VARCHAR(100)
+);
+
+CREATE TABLE global_state(
+	STATE_ID INT PRIMARY KEY,
+	STATE_NAME VARCHAR(200) NOT NULL,
+	COUNTRY_ID INT NOT NULL,
     TRANSACTION_LOG_ID VARCHAR(100),
 	RECORD_LOG VARCHAR(100)
 );
@@ -116,6 +131,8 @@ CREATE INDEX global_role_index ON global_role(ROLE_ID);
 CREATE INDEX global_system_code_index ON global_system_code(SYSTEM_TYPE, SYSTEM_CODE);
 CREATE INDEX global_upload_setting_index ON global_upload_setting(UPLOAD_SETTING_ID);
 CREATE INDEX global_company_index ON global_company(COMPANY_ID);
+CREATE INDEX global_country_index ON global_country(COUNTRY_ID);
+CREATE INDEX global_state_index ON global_state(STATE_ID);
 
 /* Stored Procedure */
 
@@ -816,6 +833,247 @@ BEGIN
 	SET @upload_setting_id = upload_setting_id;
 
 	SET @query = 'DELETE FROM global_upload_file_type WHERE UPLOAD_SETTING_ID = @upload_setting_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_company_exist(IN company_id INT)
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_company WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN street_1 VARCHAR(200), IN street_2 VARCHAR(200), IN country_id INT, IN state_id INT, IN city VARCHAR(100), IN zip_code VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_name = company_name;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @website = website;
+	SET @tax_id = tax_id;
+	SET @street_1 = street_1;
+	SET @street_2 = street_2;
+	SET @country_id = country_id;
+	SET @state_id = state_id;
+	SET @city = city;
+	SET @zip_code = zip_code;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_company SET COMPANY_NAME = @company_name, EMAIL = @email, TELEPHONE = @telephone, MOBILE = @mobile, WEBSITE = @website, TAX_ID = @tax_id, STREET_1 = @street_1, STREET_2 = @street_2, COUNTRY_ID = @country_id, STATE_ID = @state_id, CITY = @city, ZIP_CODE = @zip_code, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_company(IN company_id VARCHAR(50), IN company_name VARCHAR(100), IN email VARCHAR(50), IN telephone VARCHAR(20), IN mobile VARCHAR(20), IN website VARCHAR(100), IN tax_id VARCHAR(100), IN street_1 VARCHAR(200), IN street_2 VARCHAR(200), IN country_id INT, IN state_id INT, IN city VARCHAR(100), IN zip_code VARCHAR(10), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_name = company_name;
+	SET @email = email;
+	SET @telephone = telephone;
+	SET @mobile = mobile;
+	SET @website = website;
+	SET @tax_id = tax_id;
+	SET @street_1 = street_1;
+	SET @street_2 = street_2;
+	SET @country_id = country_id;
+	SET @state_id = state_id;
+	SET @city = city;
+	SET @zip_code = zip_code;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_company (COMPANY_ID, COMPANY_NAME, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, STREET_1, STREET_2, COUNTRY_ID, STATE_ID, CITY, ZIP_CODE, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@company_id, @company_name, @email, @telephone, @mobile, @website, @tax_id, @street_1, @street_2, @country_id, @state_id, @city, @zip_code, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_company_details(IN company_id VARCHAR(50))
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'SELECT COMPANY_NAME, COMPANY_LOGO, EMAIL, TELEPHONE, MOBILE, WEBSITE, TAX_ID, STREET_1, STREET_2, COUNTRY_ID, STATE_ID, CITY, ZIP_CODE, TRANSACTION_LOG_ID, RECORD_LOG FROM global_company WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_company(IN company_id VARCHAR(50))
+BEGIN
+	SET @company_id = company_id;
+
+	SET @query = 'DELETE FROM global_company WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_company_logo(IN company_id VARCHAR(50), IN company_logo VARCHAR(500), IN transaction_log_id VARCHAR(500), IN record_log VARCHAR(100))
+BEGIN
+	SET @company_id = company_id;
+	SET @company_logo = company_logo;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_company SET COMPANY_LOGO = @company_logo, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COMPANY_ID = @company_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_country_exist(IN country_id INT)
+BEGIN
+	SET @country_id = country_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_country WHERE COUNTRY_ID = @country_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_country(IN country_id INT, IN country_name VARCHAR(200), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @country_id = country_id;
+	SET @country_name = country_name;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_country SET COUNTRY_NAME = @country_name, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE COUNTRY_ID = @country_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_country(IN country_id INT, IN country_name VARCHAR(100), IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @country_id = country_id;
+	SET @country_name = country_name;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_country (COUNTRY_ID, COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@country_id, @country_name, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_country_details(IN country_id INT)
+BEGIN
+	SET @country_id = country_id;
+
+	SET @query = 'SELECT COUNTRY_NAME, TRANSACTION_LOG_ID, RECORD_LOG FROM global_country WHERE COUNTRY_ID = @country_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_country(IN country_id INT)
+BEGIN
+	SET @country_id = country_id;
+
+	SET @query = 'DELETE FROM global_country WHERE COUNTRY_ID = @country_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE check_state_exist(IN state_id INT)
+BEGIN
+	SET @state_id = state_id;
+
+	SET @query = 'SELECT COUNT(1) AS TOTAL FROM global_state WHERE STATE_ID = @state_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE update_state(IN state_id INT, IN state_name VARCHAR(200), IN country_id INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @state_id = state_id;
+	SET @state_name = state_name;
+	SET @country_id = country_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'UPDATE global_state SET STATE_NAME = @state_name, COUNTRY_ID = @country_id, TRANSACTION_LOG_ID = @transaction_log_id, RECORD_LOG = @record_log WHERE STATE_ID = @state_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE insert_state(IN state_id INT, IN state_name VARCHAR(100), IN country_id INT, IN transaction_log_id VARCHAR(100), IN record_log VARCHAR(100))
+BEGIN
+	SET @state_id = state_id;
+	SET @state_name = state_name;
+	SET @country_id = country_id;
+	SET @transaction_log_id = transaction_log_id;
+	SET @record_log = record_log;
+
+	SET @query = 'INSERT INTO global_state (STATE_ID, STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG) VALUES(@state_id, @state_name, @country_id, @transaction_log_id, @record_log)';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE get_state_details(IN state_id INT)
+BEGIN
+	SET @state_id = state_id;
+
+	SET @query = 'SELECT STATE_NAME, COUNTRY_ID, TRANSACTION_LOG_ID, RECORD_LOG FROM global_state WHERE STATE_ID = @state_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_state(IN state_id INT)
+BEGIN
+	SET @state_id = state_id;
+
+	SET @query = 'DELETE FROM global_state WHERE STATE_ID = @state_id';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE generate_country_options()
+BEGIN
+	SET @query = 'SELECT COUNTRY_ID, COUNTRY_NAME FROM global_country ORDER BY COUNTRY_NAME';
+
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DROP PREPARE stmt;
+END //
+
+CREATE PROCEDURE delete_all_state(IN country_id INT)
+BEGIN
+	SET @country_id = country_id;
+
+	SET @query = 'DELETE FROM global_country WHERE COUNTRY_ID = @country_id';
 
 	PREPARE stmt FROM @query;
 	EXECUTE stmt;

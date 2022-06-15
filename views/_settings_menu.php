@@ -9,9 +9,11 @@
     $system_code_page = $api->check_role_permissions($username, 30);
     $upload_setting_page = $api->check_role_permissions($username, 35);
     $company_page = $api->check_role_permissions($username, 40);
+    $country_page = $api->check_role_permissions($username, 45);
+    $state_page = $api->check_role_permissions($username, 50);
     $general_setting_page = $api->check_role_permissions($username, 35);
 
-    if($policy_page > 0 || $role_page > 0 || $user_account_page > 0 || $system_parameter_page > 0 || $system_code_page > 0 || $upload_setting_page > 0 || $company_page > 0 || $general_setting_page > 0){
+    if($policy_page > 0 || $role_page > 0 || $user_account_page > 0 || $system_parameter_page > 0 || $system_code_page > 0 || $upload_setting_page > 0 || $company_page > 0 || $country_page > 0 || $state_page > 0 || $general_setting_page > 0){
         if($general_setting_page > 0){
             $menu .= '<li class="nav-item dropdown"><a href="general-setting.php" class="nav-link">General Setting</a></li>';
         }
@@ -43,12 +45,20 @@
                     </li>';
         }
 
-        if($upload_setting_page > 0 || $system_code_page > 0 || $system_parameter_page > 0){
+        if($country_page > 0 || $state_page > 0 || $upload_setting_page > 0 || $system_code_page > 0 || $system_parameter_page > 0){
             $menu .= '<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-configurations" role="button">
+                        <a class="nav-link dropdown-toggle arrow-none" href="javascript: void(0);" id="topnav-configurations" role="button">
                             <span key="t-configurations">Configurations</span> <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-configurations">';
+
+                            if($country_page > 0){
+                                $menu .= '<a href="country.php" class="dropdown-item" key="t-country">Country</a>';
+                            }
+
+                            if($state_page > 0){
+                                $menu .= '<a href="state.php" class="dropdown-item" key="t-state">State</a>';
+                            }
 
                             if($system_code_page > 0){
                                 $menu .= '<a href="system-code.php" class="dropdown-item" key="t-system-code">System Code</a>';
