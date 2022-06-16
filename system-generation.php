@@ -279,13 +279,13 @@ if(isset($_POST['type']) && !empty($_POST['type']) && isset($_POST['username']) 
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="street_2" class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-3"></div>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="street_2" name="street_2" placeholder="Street 2" maxlength="200">
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label for="city" class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-3"></div>
                                 <div class="col-sm-3">
                                     <input type="text" class="form-control form-maxlength" autocomplete="off" id="city" name="city" placeholder="City" maxlength="100">
                                 </div>

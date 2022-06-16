@@ -659,6 +659,31 @@ class Api{
 
     # -------------------------------------------------------------
     #
+    # Name       : check_company_exist
+    # Purpose    : Checks if the company exists.
+    #
+    # Returns    : Number
+    #
+    # -------------------------------------------------------------
+    public function check_company_exist($company_id){
+        if ($this->databaseConnection()) {
+            $sql = $this->db_connection->prepare('CALL check_company_exist(:company_id)');
+            $sql->bindValue(':company_id', $company_id);
+
+            if($sql->execute()){
+                $row = $sql->fetch();
+
+                return $row['TOTAL'];
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
     # Name       : check_country_exist
     # Purpose    : Checks if the country exists.
     #
@@ -1343,6 +1368,83 @@ class Api{
 
                     if($update_system_parameter_value){
                         $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated upload setting.');
+                                    
+                        if($insert_transaction_log){
+                            return true;
+                        }
+                        else{
+                            return $insert_transaction_log;
+                        }
+                    }
+                    else{
+                        return $update_system_parameter_value;
+                    }
+                }
+            }
+            else{
+                return $sql->errorInfo()[2];
+            }
+        }
+    }
+    # -------------------------------------------------------------
+
+    # -------------------------------------------------------------
+    #
+    # Name       : update_company_details
+    # Purpose    : Updates company.
+    #
+    # Returns    : Number/String
+    #
+    # -------------------------------------------------------------
+    public function update_company_details($company_id, $company_name, $email, $telephone, $mobile, $website, $tax_id, $street_1, $street_2, $country_id, $state, $city, $zip_code, $username){
+        if ($this->databaseConnection()) {
+            $record_log = 'UPD->' . $username . '->' . date('Y-m-d h:i:s');
+            $country_details = $this->get_country_details($country_id);
+            
+            if(!empty($country_details[0]['TRANSACTION_LOG_ID'])){
+                $transaction_log_id = $country_details[0]['TRANSACTION_LOG_ID'];
+            }
+            else{
+                # Get transaction log id
+                $transaction_log_system_parameter = $this->get_system_parameter(2, 1);
+                $transaction_log_parameter_number = $transaction_log_system_parameter[0]['PARAMETER_NUMBER'];
+                $transaction_log_id = $transaction_log_system_parameter[0]['ID'];
+            }
+
+            $sql = $this->db_connection->prepare('CALL update_company_details(:company_id, :company_name, :email, :telephone, :mobile, :website, :tax_id, :street_1, :street_2, :country_id, :state, :city, :zip_code, :transaction_log_id, :record_log)');
+            $sql->bindValue(':company_id', $company_id);
+            $sql->bindValue(':company_name', $company_name);
+            $sql->bindValue(':email', $email);
+            $sql->bindValue(':telephone', $telephone);
+            $sql->bindValue(':mobile', $mobile);
+            $sql->bindValue(':website', $website);
+            $sql->bindValue(':tax_id', $tax_id);
+            $sql->bindValue(':street_1', $street_1);
+            $sql->bindValue(':street_2', $street_2);
+            $sql->bindValue(':country_id', $country_id);
+            $sql->bindValue(':state', $state);
+            $sql->bindValue(':city', $city);
+            $sql->bindValue(':zip_code', $zip_code);
+            $sql->bindValue(':transaction_log_id', $transaction_log_id);
+            $sql->bindValue(':record_log', $record_log);
+        
+            if($sql->execute()){
+                if(!empty($country_details[0]['TRANSACTION_LOG_ID'])){
+                    $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company.');
+                                    
+                    if($insert_transaction_log){
+                        return true;
+                    }
+                    else{
+                        return $insert_transaction_log;
+                    }
+                }
+                else{
+                    # Update transaction log value
+                    $update_system_parameter_value = $this->update_system_parameter_value($transaction_log_parameter_number, 2, $username);
+
+                    if($update_system_parameter_value){
+                        $insert_transaction_log = $this->insert_transaction_log($transaction_log_id, $username, 'Update', 'User ' . $username . ' updated company.');
                                     
                         if($insert_transaction_log){
                             return true;
